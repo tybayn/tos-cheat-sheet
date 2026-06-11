@@ -11,8 +11,8 @@ let all_maps = {}
 let bpm_list = []
 let bpm_los_list = []
 
-var state = {"evidence":{},"speed":{"Normal":0,"Fast":0},"los_speed":{"Slow":0,"Normal":0,"Medium":0,"Fast":0},"holy_water":{"Normal":0,"Long":0},"ghosts":{},"map":"ravenwood","map_size":"1x"}
-var user_settings = {"num_evidences":"3","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"map_type":"0","voice_prefix":0}
+var state = {"evidence":{},"speed":{"Normal":0,"Fast":0},"los_speed":{"Slow":0,"Normal":0,"Medium":0,"Fast":0},"holy_water":{"Normal":0,"Long":0},"ghosts":{},"map":"ravenwood","map_size":"M"}
+var user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
 
 let znid = getCookie("tos_znid")
 
@@ -1631,7 +1631,7 @@ function loadSettings(){
     try{
         user_settings = JSON.parse(getCookie("tos_settings"))
     } catch (error) {
-        user_settings = {"num_evidences":"3","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"map_type":"0","voice_prefix":0}
+        user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
     }
 
     user_settings['num_evidences'] = user_settings['num_evidences'] == "" ? "3" : user_settings['num_evidences']
@@ -1730,7 +1730,7 @@ function loadSettings(){
 }
 
 function resetSettings(){
-    user_settings = {"num_evidences":"3","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"map_type":"0","voice_prefix":0}
+    user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
     document.getElementById("modifier_volume").value = load_default('volume',50)
     document.getElementById("mute_broadcast").checked = load_default('mute_broadcast',0) == 1 
     document.getElementById("mute_timer_toggle").checked = load_default('mute_timer_toggle',0) == 1 
