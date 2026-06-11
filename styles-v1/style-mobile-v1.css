@@ -28,7 +28,7 @@
 
     #maintenance-block{
         width: 80%;
-        background: linear-gradient(45deg, rgb(60 49 72) 25%, rgb(49 72 58) 75%);
+        background: linear-gradient(45deg, rgb(60 49 72) 25%, rgb(49 70 72) 75%);
         padding: 40px;
         display: flex;
         flex-direction: column;
