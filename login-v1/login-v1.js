@@ -56,53 +56,7 @@ function getLink(){
                 // document.getElementById("data-stats-link").href = `https://zero-network.net/phasmo-stats/?data-id=${data_user['id']}&avatar=${data_user['type'] == 'discord' ? ('https://cdn.discordapp.com/avatars/'+data_user['id']+'/'+data_user['avatar']) : data_user['avatar']}&username=${data_user['username']}`
                 document.getElementById("data_link_status").className = "connected"
 
-                if($("#num_evidence option[value='sep3']").length === 0){
-                    var cust_settings = JSON.parse(getCookie("tos_settings"))
-
-                    fetch(`https://zero-network.net/zn/difficulties/${data_user['id']}?cheatsheet=true`, {signal: AbortSignal.timeout(6000)})
-                    .then(data => data.json())
-                    .then(data => {
-                        custom_difficulties = data
-
-                        $(`#num_evidence option[value='-10']`).remove();
-                        $(`#num_evidence option[value='sep2']`).remove();
-
-                        let presets = document.getElementById("num_evidence")
-                        var opt = document.createElement('option');
-                        opt.value = "sep2";
-                        opt.innerHTML = "---My Customs---"
-                        opt.disabled = true
-                        presets.appendChild(opt)
-                        Object.entries(data).forEach(([id,value]) => {
-                            opt = document.createElement('option');
-                            opt.value = id;
-                            opt.innerHTML = value.name;
-                            presets.appendChild(opt);
-                        })
-                        opt = document.createElement('option');
-                        opt.value = "sep3";
-                        opt.innerHTML = "----------------"
-                        opt.disabled = true
-                        presets.appendChild(opt)
-                        opt = document.createElement('option');
-                        opt.value = "-10";
-                        opt.innerHTML = "Go to Difficulty Builder >>";
-                        presets.appendChild(opt);
-
-                        document.getElementById("num_evidence").value = cust_settings.num_evidences
-                    })
-                    .then(data => {
-                        checkDifficulty();
-                        showCustom();
-                        updateMapDifficulty(cust_settings.num_evidences);
-                        filter();
-                        flashMode();
-                        resolve("User logged in")
-                    })
-                }
-                else{
-                    resolve("User already logged in")
-                }
+                resolve("User data loaded")
             })
             
         } catch(Error){
