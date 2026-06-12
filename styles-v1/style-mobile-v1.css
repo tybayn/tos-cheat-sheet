@@ -2874,4 +2874,19 @@
         -webkit-transform: scaleX(-1);
         transform: scaleX(-1);
     }
+
+    .low{
+        color:#ffffff99;
+        background: linear-gradient(90deg, rgba(0,0,0,0.25) 0%, rgba(0,75,0,0.6) 50%, rgba(0,0,0,0.25) 100%);
+    }
+
+    .average{
+        color:#ffffff99;
+        background: rgba(0,0,0,0.25);
+    }
+
+    .high{
+        color:#ffffff99;
+        background: linear-gradient(90deg, rgba(0,0,0,0.25) 0%, rgba(75,0,0,0.5) 50%, rgba(0,0,0,0.25) 100%);
+    }
 }

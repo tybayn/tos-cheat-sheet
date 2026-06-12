@@ -40,7 +40,7 @@ class Ghost {
                         <div class="speed_item_alt" style="opacity: 0.7;">${parseFloat(data.los_speed).toFixed(2)}<span class="ms">m/s</span></div>
                     </div>
                 </div>
-                <div class="ghost_hunt_entry ${data.holy_water > 3 ? 'high' : data.holy_water < 3 ? 'low' : ''}">
+                <div class="ghost_hunt_entry ${data.holy_water > 3 ? 'low' : data.holy_water < 3 ? 'high' : ''}">
                     <div class="footstep_los">
                         <img src="imgs/holy-water.png" title="Holy Water Duration">
                     </div>
