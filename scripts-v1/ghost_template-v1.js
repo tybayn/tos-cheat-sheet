@@ -249,16 +249,16 @@ class Ghost {
         msg += `<div class='dtitle'><i>{{interactions}}</i><div class='ddash'></div></div><div class="interaction-icons">`
     
         if (value["candles"] != null)
-            msg += `<div class="interaction-item"><img alt="Candle Interaction" src="imgs/candle-icon.png">${value["candles"]}</div>`
+            msg += `<div class="interaction-item candle-interaction"><img alt="Candle Interaction" src="imgs/candle-icon.png">${value["candles"]}</div>`
 
         if (value["rem"] != null)
-            msg += `<div class="interaction-item"><img alt="FLX-Pod Interaction" src="imgs/rem-icon.png">${value["rem"]}</div>`
+            msg += `<div class="interaction-item rem-interaction"><img alt="FLX-Pod Interaction" src="imgs/rem-icon.png">${value["rem"]}</div>`
 
         if (value["lights"] != null)
-            msg += `<div class="interaction-item"><img alt="Light Interaction" src="imgs/bulb-icon.png">${value["lights"]}</div>`
+            msg += `<div class="interaction-item light-interaction"><img alt="Light Interaction" src="imgs/bulb-icon.png">${value["lights"]}</div>`
 
         if (value["radios"] != null)
-            msg += `<div class="interaction-item"><img alt="Radio Interaction" src="imgs/radio-icon.png">${value["radios"]}</div>`
+            msg += `<div class="interaction-item radio-interaction"><img alt="Radio Interaction" src="imgs/radio-icon.png">${value["radios"]}</div>`
 
         msg += `</div>`
 

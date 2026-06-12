@@ -1254,7 +1254,7 @@
 
     .evidence{
         grid-column: 1;
-        grid-row: 3;
+        grid-row: 3 / 6;
         font-size: 30px;
         text-align: center;
         display: flex;
@@ -1268,6 +1268,7 @@
         background: rgba(0,0,0,0.25);
         margin-bottom: 20px;
         border-top-left-radius: 30px;
+        border-bottom-left-radius: 30px;
     }
 
     .speed_title{
@@ -1280,7 +1281,7 @@
         justify-content: flex-start;
     }
 
-    .los_speed_title{
+    .interactions_title{
         grid-column: 2;
         grid-row: 4;
         font-size: 52px;
@@ -1305,9 +1306,10 @@
         background: rgba(0,0,0,0.25);
         margin-bottom: 20px;
         border-top-right-radius: 30px;
+        padding-top: 20px;
     }
 
-    .los_speed{
+    .interactions{
         grid-column: 2;
         grid-row: 5;
         font-size: 30px;
@@ -1322,6 +1324,7 @@
         background: rgba(0,0,0,0.25);
         margin-bottom: 20px;
         border-bottom-right-radius: 30px;
+        padding-top: 20px;
     }
 
     .speed hr{
@@ -1333,38 +1336,12 @@
         display: block;
     }
 
-    .holy_water_title{
-        grid-column: 1;
-        grid-row: 4;
-        font-size: 52px;
-        z-index: 2;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-
-    .holy_water{
-        grid-column: 1;
-        grid-row: 5;
-        font-size: 30px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-content: flex-start;
-        align-items: center;
-        z-index: 2;
-        box-shadow: inset 0 0 10px #161615;
-        background: rgba(0,0,0,0.25);
-        margin-bottom: 20px;
-        border-bottom-left-radius: 30px;
-    }
-
     .hunt_sanity_num{
         color: #bbb;
-        font-size: 30px;
+        font-size: 28px;
         display: block;
         padding-top: 5px;
+        margin-left: 15px;
     }
 
     #modifier_sound_type {

@@ -51,6 +51,7 @@
     <link rel="stylesheet" href="login-v1/login-v1.css" >
     <link rel="stylesheet" href="wiki-v1/wiki-v1.css" >
     <link rel="stylesheet" href="wiki-v1/wiki-spoiler-v1.css" >
+    <link rel="stylesheet" href="modules/rolling-select/rolling-select.css" >
 </head>
 
 <body>
@@ -891,53 +892,72 @@
                 </div>
 
                 <div class="speed_title yfont white">
-                    {{speed}}
+                    {{hunts}}
                 </div>
+                
                 <div class="speed">
-                    <button id="Normal" class="tricheck white" name="speed" onclick="dualstate(this,false,true)" value="Normal">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{speed_normal}}</div>
-                    </button>
-                    <button id="Fast" class="tricheck white" name="speed" onclick="dualstate(this,false,true)" value="Fast">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{fast}}</div>
-                    </button>
+                    <div class="cycler" data-name="speed" data-options='["-", "{{%speed_normal}}", "{{%speed_fast}}"]'>
+                        <div class="cycler-label">{{speed}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
+                    <div class="cycler" data-name="los-speed" data-options='["-", "{{%los_slow}}", "{{%los_normal}}", "{{%los_medium}}", "{{%los_fast}}"]'>
+                        <div class="cycler-label">{{los_speed}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
+                    <div class="cycler" data-name="holy-water" data-options='["-", "{{%holy_water_normal}}", "{{%holy_water_long}}"]'>
+                        <div class="cycler-label">{{holy_water}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
                 </div>
-                <div class="los_speed_title yfont white">
-                    {{los_speed}}
+                <div class="interactions_title yfont white">
+                    {{interactions}}
                 </div>
-                <div class="los_speed">
-                    <button id="LosSlow" class="tricheck white" name="losspeed" onclick="dualstate(this,false,true)" value="Slow">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{los_slow}}</div>
-                    </button>
-                    <button id="LosNormal" class="tricheck white" name="losspeed" onclick="dualstate(this,false,true)" value="Normal">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{los_normal}}</div>
-                    </button>
-                    <button id="LosMedium" class="tricheck white" name="losspeed" onclick="dualstate(this,false,true)" value="Medium">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{los_medium}}</div>
-                    </button>
-                    <button id="LosFast" class="tricheck white" name="losspeed" onclick="dualstate(this,false,true)" value="Fast">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{los_fast}}</div>
-                    </button>
+                <div class="interactions">
+                    <div class="cycler" data-name="candle-interaction" data-options='["-", "{{%candle_blow_out}}", "{{%candle_no_interaction}}"]'>
+                        <div class="cycler-label">{{candles}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
+                    <div class="cycler" data-name="rem-interaction" data-options='["-", "{{%rem_interacts}}", "{{%rem_no_interaction}}"]'>
+                        <div class="cycler-label">{{rem}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
+                    <div class="cycler" data-name="light-interaction" data-options='["-", "{{%light_on_off}}", "{{%light_on_only}}", "{{%light_off_only}}", "{{%light_no_interaction}}"]'>
+                        <div class="cycler-label">{{lights}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
+                    <div class="cycler" data-name="radio-interaction" data-options='["-", "{{%radio_on_off}}", "{{%radio_on_only}}", "{{%radio_off_only}}", "{{%radio_no_interaction}}"]'>
+                        <div class="cycler-label">{{radio}}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
+                    </div>
                 </div>
-                <div class="holy_water_title yfont white">
-                    {{holy_water}}
-                </div>
-                <div class="holy_water">
-                    <button id="HolyWaterNormal" class="tricheck white" name="holywater" onclick="dualstate(this,false,true)" value="Normal">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{holy_water_normal}}</div>
-                    </button>
-                    <button id="HolyWaterLong" class="tricheck white" name="holywater" onclick="dualstate(this,false,true)" value="Long">
-                        <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                        <div class="label">{{holy_water_long}}</div>
-                    </button>
-                </div>
-
             </div>
             <div id="cur_map_label" class="yfont">{{current_map}}<div class="modifier_note_2">({{click_to_change}})</div></div>
             <button id="cur_map" class="maps_button" onclick="closeAll(true);showSideMenu('maps');">
@@ -1060,6 +1080,7 @@
     <script src="scripts-v1/search-v1.js"></script>
     <script src="scripts-v1/voice_en-v1.js"></script>
     <script src="scripts-v1/voice_recognition-v1.js"></script>
+    <script src="modules/rolling-select/rolling-select.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@8.0.13/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@8.0.13/dist/ionicons/ionicons.js"></script>
     <script>

@@ -11,7 +11,7 @@ let all_maps = {}
 let bpm_list = []
 let bpm_los_list = []
 
-var state = {"evidence":{},"speed":{"Normal":0,"Fast":0},"los_speed":{"Slow":0,"Normal":0,"Medium":0,"Fast":0},"holy_water":{"Normal":0,"Long":0},"ghosts":{},"map":"ravenwood","map_size":"M"}
+var state = {"evidence":{},"speed":"-","los_speed":"-","holy_water":"-","candle_interaction":"-","rem_interaction":"-","light_interaction":"-","radio_interaction":"-","ghosts":{},"map":"ravenwood","map_size":"M"}
 var user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
 
 let znid = getCookie("tos_znid")
@@ -515,9 +515,6 @@ function revive(){
 
 function filter(ignore_link=false){
     state["evidence"] = {}
-    state["speed"] = {"Normal":0,"Fast":0}
-    state["los_speed"] = {"None":0,"Slow":0,"Normal":0,"Fast":0}
-    state["holy_water"] = {"Normal":0,"Long":0}
 
     for (var i = 0; i < Object.keys(all_evidence).length; i++){
         state["evidence"][Object.keys(all_evidence)[i]] = 0
@@ -532,9 +529,6 @@ function filter(ignore_link=false){
     var ghost_array = [];
     var evi_array = [];
     var not_evi_array = [];
-    var spe_array = [];
-    var los_spe_array = [];
-    var holy_water_array = [];
     
     var good_checkboxes = document.querySelectorAll('[name="evidence"] .good');
     var bad_checkboxes = document.querySelectorAll('[name="evidence"] .bad');
@@ -561,45 +555,25 @@ function filter(ignore_link=false){
         state["evidence"][bad_checkboxes[i].parentElement.value] = -1;
     }
 
-    for (var i = 0; i < speed_checkboxes.length; i++) {
-        spe_array.push(speed_checkboxes[i].parentElement.value);
-        state["speed"][speed_checkboxes[i].parentElement.value] = 1;
-    }
+    var selected_speed = document.querySelector('.cycler[data-name="speed"] input').value;
+    var selected_los_speed = document.querySelector('.cycler[data-name="los-speed"] input').value;
+    var selected_holy_water = document.querySelector('.cycler[data-name="holy-water"] input').value;
+    var selected_candle_interaction = document.querySelector('.cycler[data-name="candle-interaction"] input').value;
+    var selected_rem_interaction = document.querySelector('.cycler[data-name="rem-interaction"] input').value;
+    var selected_light_interaction = document.querySelector('.cycler[data-name="light-interaction"] input').value;
+    var selected_radio_interaction = document.querySelector('.cycler[data-name="radio-interaction"] input').value;
+    state["speed"] = selected_speed;
+    state["los_speed"] = selected_los_speed;
+    state["holy_water"] = selected_holy_water;
+    state["candle_interaction"] = selected_candle_interaction;
+    state["rem_interaction"] = selected_rem_interaction;
+    state["light_interaction"] = selected_light_interaction;
+    state["radio_interaction"] = selected_radio_interaction;
 
-    for (var i = 0; i < los_speed_checkboxes.length; i++) {
-        los_spe_array.push(los_speed_checkboxes[i].parentElement.value);
-        state["los_speed"][los_speed_checkboxes[i].parentElement.value] = 1;
-    }
-
-    for (var i = 0; i < holy_water_checkboxes.length; i++) {
-        holy_water_array.push(holy_water_checkboxes[i].parentElement.value);
-        state["holy_water"][holy_water_checkboxes[i].parentElement.value] = 1;
-    }
 
     // Filter other evidences
     for (var i = 0; i < Object.keys(all_evidence).length; i++){
         var checkbox = document.getElementById(Object.keys(all_evidence)[i]);
-        $(checkbox).removeClass("block")
-        $(checkbox).find("#checkbox").removeClass(["block","disabled","faded"])
-        $(checkbox).find(".label").removeClass("disabled-text")
-    }
-    // Filter other speeds
-    for (var i = 0; i < all_speed.length; i++){
-        var checkbox = document.getElementById(all_speed[i]);
-        $(checkbox).removeClass("block")
-        $(checkbox).find("#checkbox").removeClass(["block","disabled","faded"])
-        $(checkbox).find(".label").removeClass("disabled-text")
-    }
-    // Filter other LOS speeds
-    for (var i = 0; i < all_los_speed.length; i++){
-        var checkbox = document.getElementById("Los"+all_los_speed[i]);
-        $(checkbox).removeClass("block")
-        $(checkbox).find("#checkbox").removeClass(["block","disabled","faded"])
-        $(checkbox).find(".label").removeClass("disabled-text")
-    }
-    // Filter other holy water durations
-    for (var i = 0; i < all_holy_water.length; i++){
-        var checkbox = document.getElementById("HolyWater"+all_holy_water[i]);
         $(checkbox).removeClass("block")
         $(checkbox).find("#checkbox").removeClass(["block","disabled","faded"])
         $(checkbox).find(".label").removeClass("disabled-text")
@@ -640,6 +614,11 @@ function filter(ignore_link=false){
         var los_speed = parseFloat(temp_vals[1])
         var holy_water = parseFloat(temp_vals[2])
         var cooldown = parseFloat(temp_vals[3])
+
+        var candle_interaction = ghosts[i].querySelector(".candle-interaction").innerText.trim()
+        var rem_interaction = ghosts[i].querySelector(".rem-interaction").innerText.trim()
+        var light_interaction = ghosts[i].querySelector(".light-interaction").innerText.trim()
+        var radio_interaction = ghosts[i].querySelector(".radio-interaction").innerText.trim()
 
         // Check for evidences
         // Standard
@@ -768,102 +747,91 @@ function filter(ignore_link=false){
         }
 
         //Check for speed
-        if (spe_array.length > 0){
-            if (spe_array.includes("Normal") && speed != 2.35){
+        if(selected_speed != "-"){
+            if (selected_speed == "speed_normal" && speed != 2.35){
                 keep = false
             }
-            else if (spe_array.includes("Fast") && speed <= 2.35){
+            else if (selected_speed == "speed_fast" && speed <= 2.35){
                 keep = false
             }
         }
+
         
         // Check for LOS speed
-        if (los_spe_array.length > 0){
-            if (los_spe_array.includes("Slow") && los_speed != 2.0){
+        if (selected_los_speed != "-"){
+            if (selected_los_speed == "los_slow" && los_speed != 2.0){
                 keep = false
             }
-            else if (los_spe_array.includes("Normal") && los_speed != 2.35){
+            else if (selected_los_speed == "los_normal" && los_speed != 2.35){
                 keep = false
             }
-            else if (los_spe_array.includes("Medium") && los_speed != 2.55){
+            else if (selected_los_speed == "los_medium" && los_speed != 2.55){
                 keep = false
             }
-            else if (los_spe_array.includes("Fast") && los_speed != 2.85){
+            else if (selected_los_speed == "los_fast" && los_speed != 2.85){
                 keep = false
             }
         }
 
         // Check for holy water duration
-        if (holy_water_array.length > 0){
-            if (holy_water_array.includes("Normal") && holy_water != 3){
+        if (selected_holy_water != "-"){
+            if (selected_holy_water == "holy_water_normal" && holy_water != 3){
                 keep = false
             }
-            else if (holy_water_array.includes("Long") && holy_water <= 3){
+            else if (selected_holy_water == "holy_water_long" && holy_water <= 3){
                 keep = false
             }
         }
 
+        // Check for candle interaction
+        if (selected_candle_interaction != "-"){
+            if (selected_candle_interaction == "candle_blow_out" && candle_interaction != "Blow Out"){
+                keep = false
+            }
+            else if (selected_candle_interaction == "candle_no_interaction" && candle_interaction != "X"){
+                keep = false
+            }
+        }
 
-        // Check if values are being kept
-        if (keep){
-            if(speed == 2.35){
-                keep_speed.add('Normal')
-                if (marked_not)
-                    fade_speed.add('Normal')
-                else
-                    not_fade_speed.add('Normal')
+        // Check for REM interaction
+        if (selected_rem_interaction != "-"){
+            if (selected_rem_interaction == "rem_interacts" && rem_interaction != "Interact"){
+                keep = false
             }
-            else if(speed > 2.35){
-                keep_speed.add('Fast')
-                if (marked_not)
-                    fade_speed.add('Fast')
-                else
-                    not_fade_speed.add('Fast')
+            else if (selected_rem_interaction == "rem_no_interaction" && rem_interaction != "X"){
+                keep = false
             }
+        }
 
-            if(los_speed == 2.0){
-                keep_los_speed.add('Slow')
-                if (marked_not)
-                    fade_los_speed.add('Slow')
-                else
-                    not_fade_los_speed.add('Slow')
+        // Check for light interaction
+        if (selected_light_interaction != "-"){
+            if (selected_light_interaction == "light_on_off" && light_interaction != "On/Off"){
+                keep = false
             }
-            else if(los_speed < 2.55){
-                keep_los_speed.add('Normal')
-                if (marked_not)
-                    fade_los_speed.add('Normal')
-                else
-                    not_fade_los_speed.add('Normal')
+            else if (selected_light_interaction == "light_on_only" && light_interaction != "On Only"){
+                keep = false
             }
-            else if(los_speed == 2.55){
-                keep_los_speed.add('Medium')
-                if (marked_not)
-                    fade_los_speed.add('Medium')
-                else
-                    not_fade_los_speed.add('Medium')
+            else if (selected_light_interaction == "light_off_only" && light_interaction != "Off Only"){
+                keep = false
             }
-            else if(los_speed > 2.55){
-                keep_los_speed.add('Fast')
-                if (marked_not)
-                    fade_los_speed.add('Fast')
-                else
-                    not_fade_los_speed.add('Fast')
+            else if (selected_light_interaction == "light_no_interaction" && light_interaction != "X"){
+                keep = false
             }
+        }
 
-            // Check if holy water duration is being kept
-            if(holy_water == 3){
-                keep_holy_water.add('Normal')
-                if (marked_not)
-                    fade_holy_water.add('Normal')
-                else
-                    not_fade_holy_water.add('Normal')
+        // Check for radio interaction
+        if (selected_radio_interaction != "-"){
+            if (selected_radio_interaction == "radio_on_off" && radio_interaction != "On/Off"){
+                keep = false
             }
-            else if(holy_water > 3){
-                keep_holy_water.add('Long')
-                if (marked_not)
-                    fade_holy_water.add('Long')
-                else
-                    not_fade_holy_water.add('Long')
+            else if (selected_radio_interaction == "radio_on_only" && radio_interaction != "On Only"){
+                keep = false
+            }
+            else if (selected_radio_interaction == "radio_off_only" && radio_interaction != "Off Only"){
+                keep = false
+            }
+            else if (selected_radio_interaction == "radio_no_interaction" && radio_interaction != "X"){
+                keep = false
             }
         }
 
@@ -1022,77 +990,6 @@ function filter(ignore_link=false){
             $(checkbox).find(".label").removeClass("strike")
         }
     })
-
-    fade_speed.forEach(function(item){
-        if(
-            fade_speed.has(item) && 
-            !not_fade_speed.has(item) && 
-            keep_speed.has(item) &&
-            !spe_array.includes(item)
-        ){
-            var checkbox = document.getElementById(item);
-            $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-            $(checkbox).find("#checkbox").addClass(["neutral","faded"])
-            $(checkbox).find(".label").addClass("disabled-text")
-            $(checkbox).find(".label").removeClass("strike")
-        }
-    })
-
-    fade_los_speed.forEach(function(item){
-        if(
-            fade_los_speed.has(item) && 
-            !not_fade_los_speed.has(item) && 
-            keep_los_speed.has(item) &&
-            !los_spe_array.includes(item)
-        ){
-            var checkbox = document.getElementById("Los"+item);
-            $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-            $(checkbox).find("#checkbox").addClass(["neutral","faded"])
-            $(checkbox).find(".label").addClass("disabled-text")
-            $(checkbox).find(".label").removeClass("strike")
-        }
-    })
-
-    fade_holy_water.forEach(function(item){
-        if(
-            fade_holy_water.has(item) && 
-            !not_fade_holy_water.has(item) && 
-            keep_holy_water.has(item) &&
-            !holy_water_array.includes(item)
-        ){
-            var checkbox = document.getElementById("HolyWater"+item);
-            $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-            $(checkbox).find("#checkbox").addClass(["neutral","faded"])
-            $(checkbox).find(".label").addClass("disabled-text")
-            $(checkbox).find(".label").removeClass("strike")
-        }
-    })
-
-    if (evi_array.length > 0 || not_evi_array.length > 0 || spe_array.length > 0 || los_spe_array.length > 0 || holy_water_array.length > 0){
-        all_speed.filter(spe => !keep_speed.has(spe)).forEach(function(item){
-            var checkbox = document.getElementById(item);
-            $(checkbox).addClass("block")
-            $(checkbox).find("#checkbox").removeClass(["good"])
-            $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-            $(checkbox).find(".label").addClass("disabled-text")
-        })
-        all_los_speed.filter(spe => !keep_los_speed.has(spe)).forEach(function(item){
-            var checkbox = document.getElementById("Los"+item);
-            $(checkbox).addClass("block")
-            $(checkbox).find("#checkbox").removeClass(["good"])
-            $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-            $(checkbox).find(".label").addClass("disabled-text")
-        })
-        all_holy_water.filter(spe => !keep_holy_water.has(spe)).forEach(function(item){
-            var checkbox = document.getElementById("HolyWater"+item);
-            $(checkbox).addClass("block")
-            $(checkbox).find("#checkbox").removeClass(["good"])
-            $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-            $(checkbox).find(".label").addClass("disabled-text")
-        })
-    }
-
-    
 
     prioritySort()
     clearTimeout(auto_select_timeout)

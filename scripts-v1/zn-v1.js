@@ -212,27 +212,6 @@ function loadAllAndConnect(){
                         tristate(document.getElementById(key));
                     }
                 }
-                for (const [key, value] of Object.entries(read_state["speed"])){ 
-                    if (value == 1){
-                        $("#"+key)[0].click();
-                    }
-                }
-                for (const [key, value] of Object.entries(read_state["los_speed"])){ 
-                    if (value == 1){
-                        $("#Los"+key)[0].click();
-                    }
-                }
-                for (const [key, value] of Object.entries(read_state["holy_water"])){ 
-                    if (value == 1){
-                        $("#HolyWater"+key)[0].click();
-                    }
-                }
-                // for (const [key, value] of Object.entries(read_state["sanity"])){ 
-                //     if (value == 1){
-                //         $("#"+key)[0].click();
-                //     }
-                // }
-                prev_monkey_state = read_state["prev_monkey_state"] ?? 0
 
                 for (const [key, value] of Object.entries(read_state['ghosts'])){ 
                     if (value == 0){
@@ -254,6 +233,14 @@ function loadAllAndConnect(){
                         state['ghosts'][key] = value
                     }
                 }
+
+                state["speed"] = read_state["speed"]
+                state["los_speed"] = read_state["los_speed"]
+                state["holy_water"] = read_state["holy_water"]
+                state["candle_interaction"] = read_state["candle_interaction"]
+                state["rem_interaction"] = read_state["rem_interaction"]
+                state["light_interaction"] = read_state["light_interaction"]
+                state["radio_interaction"] = read_state["radio_interaction"]
             })
             .then(() => {
                 let mquery = window.matchMedia("screen and (pointer: coarse) and (max-device-width: 600px)")
@@ -337,6 +324,8 @@ function loadAllAndConnect(){
                             document.getElementById("page-loading-status").innerText = "loading user settings..."
                             Promise.all([getLink()])
                             .then(() => {
+                                buildSelectors()
+                                loadCyclerState()
                                 setLoading(100)
                                 loadSettings()
                                 filter(true)
@@ -344,7 +333,6 @@ function loadAllAndConnect(){
                                 auto_link()
                                 openWikiFromURL()
                                 loadSearch()
-
                                 try{heartbeat()} catch(Error){console.warn("Possible latency issues!")}
                                 setInterval(function(){
                                     if(!document.hidden){
