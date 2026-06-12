@@ -3111,6 +3111,29 @@ body{
         display: none !important;
     }
 
+    .interaction-icons{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 0px;
+    }
+
+    .interaction-item{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        margin-bottom: 7px;
+    }
+
+    .interaction-item img{
+        width: 24px !important;
+        height: 24px !important;
+    }
+
     .ghost_behavior_item{
         width: 100%;
         line-height: 18px;

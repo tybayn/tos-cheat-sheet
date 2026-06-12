@@ -2450,6 +2450,28 @@
     .ghost_behavior_hidden{
         display: none !important;
     }
+
+    .interaction-icons{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        margin: 5px 0px 30px 0px;
+    }
+
+    .interaction-item{
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: center;
+        width: 25%;
+    }
+
+    .interaction-item img{
+        width: 60px !important;
+        height: 60px !important;
+    }
     
     .ghost_behavior_item{
         width: calc(100% - 40px);

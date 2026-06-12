@@ -91,7 +91,7 @@ class Ghost {
         <div class="wiki_details" style="height: 0px;">
             <div class="text">
                 <p><b>{{abilities_behaviors_tells}}</b></p>
-                ${Object.keys(data.wiki).length > 0 ? this.build_tells(data.wiki["tells"],data.wiki["behaviors"],data.wiki["abilities"]) : ""}
+                ${Object.keys(data.wiki).length > 0 ? this.build_tells(data.wiki["candles"],data.wiki["rem"],data.wiki["lights"],data.wiki["radios"],data.wiki["tells"],data.wiki["behavior"],data.wiki["abilities"],data.wiki["interactions"]) : ""}
                 <p><b>{{confirmation_tests}}</b> †</p>
                 ${Object.keys(data.wiki).length > 0 ? this.build_confirmation_tests(data.ghost,data.name,data.wiki["confirmation_tests"]) : ""}
                 <p><b>{{elimination_tests}}</b></p>
@@ -107,8 +107,22 @@ class Ghost {
         return `<div class="ghost_evidence_item" ${evidence in evi_color ? 'style=\"color:' + evi_color[evidence] + ' !important;\"' : ''} name="${evidence}"><img src="${evi_icons[evidence]}">${wordless ? '' : evidence_name}</div>`
     }
 
-    build_tells(tells,behavior,abilities){
-        var data = "<ul>"
+    build_tells(candles,rem,lights,radios,tells,behavior,abilities,interactions){
+        var data = `<div class="interaction-icons">`
+    
+        if (candles != null)
+            data += `<div class="interaction-item"><img src="imgs/candle-icon.png">${candles}</div>`
+
+        if (rem != null)
+            data += `<div class="interaction-item"><img src="imgs/rem-icon.png">${rem}</div>`
+
+        if (lights != null)
+            data += `<div class="interaction-item"><img src="imgs/bulb-icon.png">${lights}</div>`
+
+        if (radios != null)
+            data += `<div class="interaction-item"><img src="imgs/radio-icon.png">${radios}</div>`
+
+        data += `</div><ul>`
 
         for(var i in tells){
             if(tells[i]["is_0_evi"]){
@@ -133,6 +147,15 @@ class Ghost {
                 data += `<li><b>{{ability}}</b>: ${abilities[i]["data"]}</li>`
                 if(abilities[i].hasOwnProperty("note"))
                     data += `<br><i>{{note}}: ${abilities[i]["note"]}</i>`
+                data += "</li>"
+            }
+        }
+
+        for(var i in interactions){
+            if(interactions[i]["is_0_evi"]){
+                data += `<li><b>{{interaction}}</b>: ${interactions[i]["data"]}</li>`
+                if(interactions[i].hasOwnProperty("note"))
+                    data += `<br><i>{{note}}: ${interactions[i]["note"]}</i>`
                 data += "</li>"
             }
         }
@@ -202,6 +225,7 @@ class Ghost {
 
     behavior(value){
         var msg = "<div class='ghost_behavior_item'>"
+
         var opened = false
 
         // Load Tells
@@ -221,6 +245,22 @@ class Ghost {
                 msg += "</ul>"
             }
         }
+
+        msg += `<div class='dtitle'><i>{{interactions}}</i><div class='ddash'></div></div><div class="interaction-icons">`
+    
+        if (value["candles"] != null)
+            msg += `<div class="interaction-item"><img alt="Candle Interaction" src="imgs/candle-icon.png">${value["candles"]}</div>`
+
+        if (value["rem"] != null)
+            msg += `<div class="interaction-item"><img alt="FLX-Pod Interaction" src="imgs/rem-icon.png">${value["rem"]}</div>`
+
+        if (value["lights"] != null)
+            msg += `<div class="interaction-item"><img alt="Light Interaction" src="imgs/bulb-icon.png">${value["lights"]}</div>`
+
+        if (value["radios"] != null)
+            msg += `<div class="interaction-item"><img alt="Radio Interaction" src="imgs/radio-icon.png">${value["radios"]}</div>`
+
+        msg += `</div>`
 
         msg += "</div>"
         return msg
