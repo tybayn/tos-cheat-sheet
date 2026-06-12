@@ -808,13 +808,10 @@ function filter(ignore_link=false){
             if (selected_light_interaction == "light_on_off" && light_interaction != "On/Off"){
                 keep = false
             }
-            else if (selected_light_interaction == "light_on_only" && light_interaction != "On Only"){
+            else if (selected_light_interaction == "light_on_only" && ['X','Off Only'].includes(light_interaction)){
                 keep = false
             }
-            else if (selected_light_interaction == "light_off_only" && light_interaction != "Off Only"){
-                keep = false
-            }
-            else if (selected_light_interaction == "light_no_interaction" && light_interaction != "X"){
+            else if (selected_light_interaction == "light_off_only" && ['X','On Only'].includes(light_interaction)){
                 keep = false
             }
         }
@@ -824,13 +821,10 @@ function filter(ignore_link=false){
             if (selected_radio_interaction == "radio_on_off" && radio_interaction != "On/Off"){
                 keep = false
             }
-            else if (selected_radio_interaction == "radio_on_only" && radio_interaction != "On Only"){
+            else if (selected_radio_interaction == "radio_on_only" && ['X','Off Only'].includes(radio_interaction)){
                 keep = false
             }
-            else if (selected_radio_interaction == "radio_off_only" && radio_interaction != "Off Only"){
-                keep = false
-            }
-            else if (selected_radio_interaction == "radio_no_interaction" && radio_interaction != "X"){
+            else if (selected_radio_interaction == "radio_off_only" && ['X','On Only'].includes(radio_interaction)){
                 keep = false
             }
         }

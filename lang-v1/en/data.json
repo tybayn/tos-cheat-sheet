@@ -33,15 +33,13 @@
 
     "{{lights}}": "Lights",
     "{{light_on_off}}": "On/Off",
-    "{{light_on_only}}": "On Only",
-    "{{light_off_only}}": "Off Only",
-    "{{light_no_interaction}}": "No Interaction",
+    "{{light_on_only}}": "Turned On",
+    "{{light_off_only}}": "Turned Off",
 
     "{{radio}}": "Radio",
     "{{radio_on_off}}": "On/Off",
-    "{{radio_on_only}}": "On Only",
-    "{{radio_off_only}}": "Off Only",
-    "{{radio_no_interaction}}": "No Interaction",
+    "{{radio_on_only}}": "Turned On",
+    "{{radio_off_only}}": "Turned Off",
 
     "{{holy_water}}": "Holy Water",
     "{{holy_water_normal}}": "Normal <span class=\"hunt_sanity_num\">3s</span>",
