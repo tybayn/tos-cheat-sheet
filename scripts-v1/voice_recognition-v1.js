@@ -332,22 +332,21 @@ function parse_speech(vtext){
                 smallest_speed = all_speed[i]
             }
         }
+
         console.log(`${prevtext} >> ${vtext} >> ${smallest_speed}`)
         running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> ${smallest_speed}`
         domovoi_msg += smallest_speed
 
-        if(!$(document.getElementById(smallest_speed).querySelector("#checkbox")).hasClass("block")){
-            while (!document.getElementById(smallest_speed).querySelector("#checkbox").classList.contains({"1":"good","0":"neutral"}[vvalue.toString()])){
-                dualstate(document.getElementById(smallest_speed));
-            }
-        }
-        else{
-            domovoi_msg = `Speed ${smallest_speed} is locked!`
-        }
+        if (vvalue == 1)
+            setCyclerValue("speed", "speed_" + smallest_speed.toLowerCase().trim())
+        else
+            setCyclerValue("speed", "-")
+
         resetResetButton()
         domovoi_heard(domovoi_msg)
         running_log[cur_idx]["Domo"] = domovoi_msg
         reset_voice_status()
+        filter()
 
     }
     else if(vtext.startsWith('los') ||vtext.startsWith('los speed') || vtext.startsWith('loss speed') || vtext.startsWith('line of sight speed') ){
@@ -396,18 +395,16 @@ function parse_speech(vtext){
         running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> ${smallest_speed}`
         domovoi_msg += smallest_speed
 
-        if(!$(document.getElementById("Los"+smallest_speed).querySelector("#checkbox")).hasClass("block")){
-            while (!document.getElementById("Los"+smallest_speed).querySelector("#checkbox").classList.contains({"1":"good","0":"neutral"}[vvalue.toString()])){
-                dualstate(document.getElementById("Los"+smallest_speed));
-            }
-        }
-        else{
-            domovoi_msg = `LOS Speed ${smallest_speed} is locked!`
-        }
+        if (vvalue == 1)
+            setCyclerValue("los-speed", "los_" + smallest_speed.toLowerCase().trim())
+        else
+            setCyclerValue("los-speed", "-")
+
         resetResetButton()
         domovoi_heard(domovoi_msg)
         running_log[cur_idx]["Domo"] = domovoi_msg
         reset_voice_status()
+        filter()
 
     }
     else if(vtext.startsWith('holy water')){
@@ -456,18 +453,160 @@ function parse_speech(vtext){
         running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> ${smallest_speed}`
         domovoi_msg += smallest_speed
 
-        if(!$(document.getElementById("HolyWater"+smallest_speed).querySelector("#checkbox")).hasClass("block")){
-            while (!document.getElementById("HolyWater"+smallest_speed).querySelector("#checkbox").classList.contains({"1":"good","0":"neutral"}[vvalue.toString()])){
-                dualstate(document.getElementById("HolyWater"+smallest_speed));
-            }
-        }
-        else{
-            domovoi_msg = `Holy Water ${smallest_speed} is locked!`
-        }
+        if (vvalue == 1)
+            setCyclerValue("holy-water", "holy_water_" + smallest_speed.toLowerCase().trim())
+        else
+            setCyclerValue("holy-water", "-")
+
         resetResetButton()
         domovoi_heard(domovoi_msg)
         running_log[cur_idx]["Domo"] = domovoi_msg
         reset_voice_status()
+        filter()
+
+    }
+    else if(vtext.startsWith('candles') || vtext.startsWith('candle')){
+        document.getElementById("voice_recognition_status").className = null
+        document.getElementById("voice_recognition_status").style.backgroundImage = "url(imgs/mic-recognized.png)"
+        console.log("Recognized candle command")
+        running_log[cur_idx]["Type"] = "candle"
+        console.log(`Heard '${vtext}'`)
+        vtext = vtext.replace('candles', "").replace('candle', "").trim()
+        domovoi_msg += "marked candles as "
+        prevtext = vtext
+
+        if (vtext.startsWith("blow out") || vtext.startsWith("blowout") || vtext.startsWith("blown out") || vtext.startsWith("blownout") || vtext.startsWith("extinguish")){
+            setCyclerValue("candle-interaction", "candle_blow_out")
+            domovoi_msg += "blown out"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> blown out`
+            console.log(`${prevtext} >> ${vtext} >> blown out`)
+        }
+        else{
+            setCyclerValue("candle-interaction", "-")
+            domovoi_msg += "unset"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> unset`
+            console.log(`${prevtext} >> ${vtext} >> unset`)
+        }
+
+        resetResetButton()
+        domovoi_heard(domovoi_msg)
+        running_log[cur_idx]["Domo"] = domovoi_msg
+        reset_voice_status()
+        filter()
+
+    }
+    else if(vtext.startsWith('flx pod')){
+        document.getElementById("voice_recognition_status").className = null
+        document.getElementById("voice_recognition_status").style.backgroundImage = "url(imgs/mic-recognized.png)"
+        console.log("Recognized flx pod command")
+        running_log[cur_idx]["Type"] = "flx pod"
+        console.log(`Heard '${vtext}'`)
+        vtext = vtext.replace('flx pod', "").trim()
+        domovoi_msg += "marked flx pod as "
+        prevtext = vtext
+
+        if (vtext.startsWith("interact") || vtext.startsWith("touch") || vtext.startsWith("use")){
+            setCyclerValue("rem-interaction", "rem_interacts")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> interacted`
+            console.log(`${prevtext} >> ${vtext} >> interacted`)
+        }
+        else{
+            setCyclerValue("rem-interaction", "-")
+            domovoi_msg += "unset"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> unset`
+            console.log(`${prevtext} >> ${vtext} >> unset`)
+        }
+
+        resetResetButton()
+        domovoi_heard(domovoi_msg)
+        running_log[cur_idx]["Domo"] = domovoi_msg
+        reset_voice_status()
+        filter()
+
+    }
+    else if(vtext.startsWith('lights')){
+        document.getElementById("voice_recognition_status").className = null
+        document.getElementById("voice_recognition_status").style.backgroundImage = "url(imgs/mic-recognized.png)"
+        console.log("Recognized lights command")
+        running_log[cur_idx]["Type"] = "lights"
+        console.log(`Heard '${vtext}'`)
+        vtext = vtext.replace('lights', "").trim()
+        domovoi_msg += "marked lights as "
+        prevtext = vtext
+
+        if (vtext.startsWith("on") || vtext.startsWith("turned on") || vtext.startsWith("turn on")){
+            setCyclerValue("light-interaction", "light_on_only")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> turned on`
+            console.log(`${prevtext} >> ${vtext} >> turned on`)
+        }
+        else if (vtext.startsWith("off") || vtext.startsWith("turned off") || vtext.startsWith("turn off")){
+            setCyclerValue("light-interaction", "light_off_only")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> turned off`
+            console.log(`${prevtext} >> ${vtext} >> turned off`)
+        }
+        else if (vtext.startsWith("both")){
+            setCyclerValue("light-interaction", "light_on_off")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> both`
+            console.log(`${prevtext} >> ${vtext} >> both`)
+        }
+        else{
+            setCyclerValue("light-interaction", "-")
+            domovoi_msg += "unset"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> unset`
+            console.log(`${prevtext} >> ${vtext} >> unset`)
+        }
+
+        resetResetButton()
+        domovoi_heard(domovoi_msg)
+        running_log[cur_idx]["Domo"] = domovoi_msg
+        reset_voice_status()
+        filter()
+
+    }
+    else if(vtext.startsWith('radio')){
+        document.getElementById("voice_recognition_status").className = null
+        document.getElementById("voice_recognition_status").style.backgroundImage = "url(imgs/mic-recognized.png)"
+        console.log("Recognized radio command")
+        running_log[cur_idx]["Type"] = "radio"
+        console.log(`Heard '${vtext}'`)
+        vtext = vtext.replace('radio', "").trim()
+        domovoi_msg += "marked radio as "
+        prevtext = vtext
+
+        if (vtext.startsWith("on") || vtext.startsWith("turned on") || vtext.startsWith("turn on")){
+            setCyclerValue("radio-interaction", "radio_on_only")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> turned on`
+            console.log(`${prevtext} >> ${vtext} >> turned on`)
+        }
+        else if (vtext.startsWith("off") || vtext.startsWith("turned off") || vtext.startsWith("turn off")){
+            setCyclerValue("radio-interaction", "radio_off_only")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> turned off`
+            console.log(`${prevtext} >> ${vtext} >> turned off`)
+        }
+        else if (vtext.startsWith("both")){
+            setCyclerValue("radio-interaction", "radio_on_off")
+            domovoi_msg += "interacted"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> both`
+            console.log(`${prevtext} >> ${vtext} >> both`)
+        }
+        else{
+            setCyclerValue("radio-interaction", "-")
+            domovoi_msg += "unset"
+            running_log[cur_idx]["Debug"] = `${prevtext} >> ${vtext} >> unset`
+            console.log(`${prevtext} >> ${vtext} >> unset`)
+        }
+
+        resetResetButton()
+        domovoi_heard(domovoi_msg)
+        running_log[cur_idx]["Domo"] = domovoi_msg
+        reset_voice_status()
+        filter()
 
     }
     else if(vtext == 'timer start' || vtext == 'timer stop' || vtext == 'cooldown start' || vtext == 'cool down start' || vtext == 'cooldown stop' || vtext == 'cool down stop'){

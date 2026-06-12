@@ -48,7 +48,7 @@ class Ghost {
                         ${data.holy_water}<span class="ms">s</span>
                     </div>
                 </div>
-                <div class="ghost_hunt_entry ${data.cooldown > 60 ? 'high' : data.cooldown < 60 ? 'low' : ''}">
+                <div class="ghost_hunt_entry ${data.cooldown > 60 ? 'low' : data.cooldown < 60 ? 'high' : ''}">
                     <div class="footstep_los">
                         <img src="imgs/stopwatch.png" title="Cooldown Duration">
                     </div>

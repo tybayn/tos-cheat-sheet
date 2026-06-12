@@ -14,7 +14,13 @@ const ZNLANG = {
         "start":["stat"],
         "timer":["i'm a","im a"],
         "cooldown":["pull down"],
-        "domo":["demo"]
+        "domo":["demo"],
+        "candles":["candle"],
+        "blown out":["blown out","blow out","blownout","s blosn out","s blown out","s blow out"],
+        "flx pod":["flex pod","flax pod","flex part","flax part","flexed","rem part","ram part","ram pod","rem pod","flux pod","flex","flax","flux","rem","ram"],
+        "lights":[],
+        "radio":["radios","radio's"],
+        "both":["on and off"]
     },
     "ghosts":{
         "banshee":[],
