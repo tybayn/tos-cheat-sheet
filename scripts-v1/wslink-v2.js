@@ -31,7 +31,9 @@ var pos_colors = {
     1:"ff0000",
     2:"00ff00",
     3:"0000ff",
-    4:"ca36dd"
+    4:"ca36dd",
+    5:"ffb814",
+    6:"14d8ff"
 }
 
 // --------------- Override WS send
@@ -183,15 +185,19 @@ function create_room(){
     var outgoing_state = {
         'evidence': state['evidence'],
         'speed': state['speed'],
-        'los': state['los'],
-        'sanity': state['sanity'],
+        'los_speed': state['los_speed'],
+        'holy_water': state['holy_water'],
+        'candle_interaction': state['candle_interaction'],
+        'rem_interaction': state['rem_interaction'],
+        'light_interaction': state['light_interaction'],
+        'radio_interaction': state['radio_interaction'],
         'ghosts': state['ghosts'],
         "map": state['map'],
         'settings': {
             "num_evidences":document.getElementById("num_evidence").value
         }
     }
-    fetch(`https://zero-network.net/znlink/create-room/${znid}`,{method:"POST",Accept:"application/json",body:JSON.stringify(outgoing_state),signal: AbortSignal.timeout(6000)})
+    fetch(`https://zero-network.net/zntlink/create-room/${znid}`,{method:"POST",Accept:"application/json",body:JSON.stringify(outgoing_state),signal: AbortSignal.timeout(6000)})
     .then(response => response.json())
     .then(data => {
         var room_id = data['room_id']
@@ -211,7 +217,7 @@ function create_link(auto_link = false){
     relink_live = false
     relink_interval = null
     relink_timeout = null
-    fetch(`https://zero-network.net/znlink/create-link/${znid}`,{method:"POST",Accept:"application/json",signal: AbortSignal.timeout(6000)})
+    fetch(`https://zero-network.net/zntlink/create-link/${znid}`,{method:"POST",Accept:"application/json",signal: AbortSignal.timeout(6000)})
     .then(response => response.json())
     .then(data => {
         var link_id = data['link_id']
@@ -230,7 +236,7 @@ function create_link(auto_link = false){
 function link_room(){
     var room_id = document.getElementById("room_id").value
     var load_pos = getCookie("tos_link-position")
-    ws = new WebSocket(`wss://zero-network.net/phasmolink/link/${znid}/${room_id}${load_pos ? '?pos='+load_pos : ''}`);
+    ws = new WebSocket(`wss://zero-network.net/toslink/link/${znid}/${room_id}${load_pos ? '?pos='+load_pos : ''}`);
     setCookie("tos_room_id",room_id,1)
 
     ws.onopen = function(event){
@@ -250,7 +256,7 @@ function link_room(){
         document.getElementById("room_id_note").innerText = `${lang_data['{{error}}']}: ${lang_data['{{could_not_connect}}']}`
         document.getElementById("settings_status").className = "error"
         setCookie("tos_room_id","",-1)
-        document.getElementById("map-explorer-link-2").href = `https://zero-network.net/phasmo-cheat-sheet/map-explorer/`
+        //document.getElementById("map-explorer-link-2").href = `https://zero-network.net/tos-cheat-sheet/map-explorer/`
     }
     ws.onmessage = function(event) {
         try {
@@ -271,7 +277,7 @@ function link_room(){
                 pos_elem.style.backgroundColor = `#${pos_colors[my_pos]}44`
                 $(pos_elem).show()
                 var lmap = document.getElementsByClassName("selected_map")[0].id
-                document.getElementById("map-explorer-link-2").href = `https://zero-network.net/phasmo-cheat-sheet/map-explorer/?jlid=${room_id}&pos=${my_pos}&share=${lmap}`
+                //document.getElementById("map-explorer-link-2").href = `https://zero-network.net/tos-cheat-sheet/map-explorer/?jlid=${room_id}&pos=${my_pos}&share=${lmap}`
                 if($(".guessed").length > 0){
                     send_guess($(".guessed")[0].id)
                 }
@@ -308,14 +314,6 @@ function link_room(){
                         send_guess($(".guessed")[0].id)
                     }
                 }
-                if (action == "TIMER"){
-                    if(incoming_state.hasOwnProperty("force_start") && incoming_state.hasOwnProperty("force_stop")){
-                        toggle_timer(incoming_state["force_start"], incoming_state["force_stop"])
-                    }
-                    else{
-                        toggle_timer()
-                    }
-                }
                 if (action == "COOLDOWNTIMER"){
                     if(incoming_state.hasOwnProperty("force_start") && incoming_state.hasOwnProperty("force_stop")){
                         toggle_cooldown_timer(incoming_state["force_start"], incoming_state["force_stop"])
@@ -330,14 +328,6 @@ function link_room(){
                     }
                     else{
                         toggle_hunt_timer()
-                    }
-                }
-                if (action == "SOUNDTIMER"){
-                    if(incoming_state.hasOwnProperty("force_start") && incoming_state.hasOwnProperty("force_stop")){
-                        toggle_sound_timer(incoming_state["force_start"], incoming_state["force_stop"])
-                    }
-                    else{
-                        toggle_sound_timer()
                     }
                 }
                 if (action == "CHANGE"){
@@ -384,22 +374,10 @@ function link_room(){
 
             else{
                 if (
-                    document.getElementById("num_evidence").value != incoming_state['settings']['num_evidences'] ||
-                    document.getElementById("cust_num_evidence").value != incoming_state['settings']['cust_num_evidences'] ||
-                    document.getElementById("cust_hunt_length").value != incoming_state['settings']['cust_hunt_length'] ||
-                    document.getElementById("cust_starting_sanity").value != incoming_state['settings']['cust_starting_sanity'] ||
-                    document.getElementById("cust_sanity_pill_rest").value != incoming_state['settings']['cust_sanity_pill_rest'] ||
-                    document.getElementById("cust_sanity_drain").value != incoming_state['settings']['cust_sanity_drain'] ||
-                    document.getElementById("cust_lobby_type").value != incoming_state['settings']['cust_lobby_type']
+                    document.getElementById("num_evidence").value != incoming_state['settings']['num_evidences']
                 ){
-                    if(incoming_state['settings']['num_evidences'] != document.getElementById("num_evidence").value){
-                        document.getElementById("num_evidence").style.width = "100%"
-                    }
                     if(incoming_state['settings']['num_evidences'] != "")
                         document.getElementById("num_evidence").value = incoming_state['settings']['num_evidences']
-
-
-                    set_sanity_settings()
                     updateMapDifficulty(incoming_state['settings']['num_evidences'])
                     flashMode()
                 }
@@ -457,70 +435,21 @@ function link_room(){
                     },500)
                 }
 
-                prev_monkey_state = incoming_state["prev_monkey_state"] ?? 0
-
                 var prev_evidence = state['evidence']
-                var new_mp = false
                 for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
-
-                    if(value == -2){
-                        if(prev_evidence[key] != -2){
-                            monkeyPawFilter($(document.getElementById(key)).parent().find(".monkey-paw-select"),true)
-                            new_mp = true
-                        }
+                    while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
+                        tristate(document.getElementById(key),true);
                     }
-                    else{
-                        if(prev_evidence[key] == -2 && !new_mp){
-                            monkeyPawFilter($(document.getElementById(key)).parent().find(".monkey-paw-select"),true)
-                        }
-                        while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
-                            tristate(document.getElementById(key),true);
-                        }
-                    }
-                }
-                for (const [key, value] of Object.entries(incoming_state["speed"])){ 
-                    while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["neutral","good"][value])){
-                        dualstate(document.getElementById(key),true);
-                    }
-                }
-                for (const [key, value] of Object.entries(incoming_state["sanity"])){ 
-                    while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["neutral","good"][value])){
-                        dualstate(document.getElementById(key),true,true);
-                    }
+                    
                 }
 
-                if(incoming_state.hasOwnProperty("los")){
-                    while (!$(document.getElementById("LOS").querySelector("#checkbox")).hasClass(["neutral","bad","good"][incoming_state["los"]+1])){
-                        tristate(document.getElementById("LOS"),true,true);
-                    }
-                }
-
-                if(incoming_state.hasOwnProperty("forest_minion")){
-                    if(incoming_state["forest_minion"]){
-                        toggleForestMinion(0, true, true)
-                    }
-                    else{
-                        toggleForestMinion(1, true)
-                    }
-                }
-
-                if(incoming_state.hasOwnProperty("coal")){
-                    if(incoming_state["coal"]){
-                        toggleCoal(true,false,true)
-                    }
-                    else{
-                        toggleCoal(false,true,true)
-                    }
-                }
-
-                if(incoming_state.hasOwnProperty("blood_moon")){
-                    if(incoming_state["blood_moon"]){
-                        toggleBloodMoon(true,false,true)
-                    }
-                    else{
-                        toggleBloodMoon(false,true,true)
-                    }
-                }
+                setCyclerValue("speed",incoming_state["speed"])
+                setCyclerValue("los-speed",incoming_state["los_speed"])
+                setCyclerValue("holy-water",incoming_state["holy_water"])
+                setCyclerValue("candle-interaction",incoming_state["candle_interaction"])
+                setCyclerValue("light-interaction",incoming_state["light_interaction"])
+                setCyclerValue("radio-interaction",incoming_state["radio_interaction"])
+                setCyclerValue("rem-interaction",incoming_state["rem_interaction"])
                 
                 filter(true)
                 state_received = true
@@ -617,7 +546,7 @@ function link_link(reconnect = false){
     }
 
     try {
-        dlws = new WebSocket(`wss://zero-network.net/phasmolink/link/${link_id}?me=ZNCS${reconnect ? "&reconnect=true" : ""}`);
+        dlws = new WebSocket(`wss://zero-network.net/toslink/link/${link_id}?me=ZNCS${reconnect ? "&reconnect=true" : ""}`);
     } catch (e) {
         console.error("[WS] Connection failed:", e);
         scheduleReconnect();
@@ -949,7 +878,7 @@ function disconnect_room(reset=false,has_status=false){
     try { document.getElementById(`guess_pos_3`).remove()} catch (error) {} 
     try { document.getElementById(`guess_pos_4`).remove()} catch (error) {} 
     var lmap = document.getElementsByClassName("selected_map")[0].id
-    document.getElementById("map-explorer-link-2").href = `https://zero-network.net/phasmo-cheat-sheet/map-explorer/?share=${lmap}`
+    //document.getElementById("map-explorer-link-2").href = `https://zero-network.net/the-other-side/map-explorer/?share=${lmap}`
     if (Object.keys(data_user).length == 0)
         $('.card_icon_guess').hide()
     clearInterval(ws_ping)
@@ -1273,15 +1202,15 @@ function send_state() {
         var outgoing_state = JSON.stringify({
             'evidence': state['evidence'],
             'speed': state['speed'],
-            'los': state['los'],
-            'sanity': state['sanity'],
+            'los_speed': state['los_speed'],
+            'holy_water': state['holy_water'],
+            'candle_interaction': state['candle_interaction'],
+            'rem_interaction': state['rem_interaction'],
+            'light_interaction': state['light_interaction'],
+            'radio_interaction': state['radio_interaction'],
             'ghosts': state['ghosts'],
             "map": state['map'],
             "map_size": state['map_size'],
-            "prev_monkey_state": state['prev_monkey_state'],
-            "coal": document.getElementById("coal-icon").classList.contains("coal-active") ? 1 : 0,
-            "forest_minion": $("#forest-minion-mod").text() != '0' ? 1 : 0,
-            "blood_moon": document.getElementById("blood-moon-icon").classList.contains("blood-moon-active") ? 1 : 0,
             'settings': {
                 "num_evidences":document.getElementById("num_evidence").value
             }
