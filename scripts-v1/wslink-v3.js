@@ -857,6 +857,20 @@ function send_ghost_data_link(ghost){
         data = data.replace("🔊","")
         data = data.replaceAll("<b>\n\n","<b>\n")
         data = data.replace(/[ ]+/g,' ').trim()
+
+        // Handle interactions
+        let inter_og = data.split(`\n<b>${lang_data['{{interactions}}']}:<b>\n`)[1]
+        let inter = inter_og.trim().split("\n")
+        let inter_data = ""
+        if(inter){
+            inter_data += `Candles - ${inter[0]}\n`
+            inter_data += `FLX-Pod - ${inter[1]}\n`
+            inter_data += `Lights - ${inter[2]}\n`
+            inter_data += `Radio - ${inter[3]}`
+        }
+        data = data.replace(inter_og,inter_data)
+
+
         $(document.getElementById(ghost)).addClass(readd_classes)
         
         dlws.send(JSON.stringify({"action":"GHOSTDATA","ghost":`${ghost}|${data}`}))
