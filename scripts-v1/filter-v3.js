@@ -1875,21 +1875,14 @@ function resetFilters(skip_filter=false){
         state['evidence'][Object.keys(all_evidence)[i]] = 0
     }
 
-    for(var i = 0; i < all_speed.length; i++){
-        let e = document.getElementById(all_speed[i])
-        $(e).removeClass(["block"])
-        e.querySelector("#checkbox").className = "neutral"
-        $(e.querySelector(".label")).removeClass(["strike","disabled-text"]);
+    setCyclerValue("speed",'-')
+    setCyclerValue("los-speed",'-')
+    setCyclerValue("holy-water",'-')
+    setCyclerValue("candle-interaction",'-')
+    setCyclerValue("light-interaction",'-')
+    setCyclerValue("radio-interaction",'-')
+    setCyclerValue("rem-interaction",'-')
 
-        state['speed'][all_speed[i]] = 0
-    }
-
-    let e = document.getElementById("LOS")
-    $(e).removeClass(["block"])
-    e.querySelector("#checkbox").className = "neutral"
-    $(e.querySelector(".label")).removeClass(["strike","disabled-text"]);
-
-    state['los'] = -1
 
     if(!skip_filter){
         setCookie("tos_state",JSON.stringify(state),1)
