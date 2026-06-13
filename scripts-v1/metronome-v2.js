@@ -3,17 +3,16 @@ loadSound('https://zero-network.net/the-other-side/static/assets/footstep_1.mp3'
 loadSound('https://zero-network.net/the-other-side/static/assets/footstep_2.mp3',0)
 loadSound('https://zero-network.net/the-other-side/static/assets/footstep_3.mp3',0)
 
-var speed = 2.35
+var speed = 2.42
 var muteTimerToggle = false
 var muteTimerCountdown = false
 
 var offset = 0
 var step_duration = 5 * 1000
 
-let em = (bm,fm,c) => (bm||c?1.15:1.0)*(1.0+(fm*0.1))
-let speedToBpm = (x) => 40 * x - 5
+let speedToBpm = (x) => 100 * x - 150
 let speedToRand = (x,y) => parseFloat((Math.random() * (speedToBpm(x+y) - speedToBpm(x-y)) + speedToBpm(x-y)).toFixed(2)) - speedToBpm(x)
-let bpmToSpeed = (x) => (x + 5) / 40
+let bpmToSpeed = (x) => (x + 150) / 100
 
 var last_id = "";
 
@@ -484,6 +483,6 @@ function calibrateOffset(speed){
             return
         }
 
-        calibration_progress(1-(Math.abs(Math.min(0.099,2.35-speed)/0.1))-0.02)
+        calibration_progress(1-(Math.abs(Math.min(0.099,2.42-speed)/0.1))-0.02)
     }
 }

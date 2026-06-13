@@ -30,7 +30,7 @@ class Ghost {
         <div class="ghost_card" id="${data.ghost}">
             <div class="ghost_name" onclick="toggleGhostExpand(this)">${data.name}</div>
             <div class="ghost_hunt_info">
-                <div class="ghost_hunt_entry ${data.speed > 2.35 ? 'high' : data.speed < 2.35 ? 'low' : ''}">
+                <div class="ghost_hunt_entry ${data.speed > 2.42 ? 'high' : data.speed < 2.42 ? 'low' : ''}">
                     <div class="footstep_los">
                         <img src="imgs/footsteps.png" style="filter: invert(1);">
                         <img src="imgs/los.png" title="LOS Speed" style="margin-bottom: -5px; opacity: 0.7;">

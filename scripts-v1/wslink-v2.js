@@ -224,7 +224,7 @@ function create_link(auto_link = false){
         document.getElementById("link_id").value = link_id
         link_link()
         if(auto_link){
-            var url = `zndl:${link_id}`
+            var url = `zndt:${link_id}`
             $('<iframe src="' + url + '" width="1px" height="1px" style="display:none;">').appendTo('body');
         }
     })
@@ -649,13 +649,9 @@ function link_link(reconnect = false){
                 dlws.send('{"action":"LINK"}');
                 send_data_link();
                 send_map_preload_link();
-                send_sanity_link(Math.round(sanity), sanity_color());
-                send_timer_link("TIMER_VAL", "0:00");
                 send_timer_link("COOLDOWN_VAL", "0:00");
                 send_timer_link("HUNT_VAL", "0:00");
-                send_timer_link("SOUND_VAL", "0:00");
                 send_bpm_link("-", "-", "100%");
-                send_modifier_link()
                 filter();
 
                 start_dlws_ping();
@@ -682,18 +678,6 @@ function link_link(reconnect = false){
                 send_state()
             }
 
-            else if (action == "NEXTMAPTYPE"){
-                switchMapType(true,false)
-                saveSettings()
-                send_cur_map_link()
-            }
-
-            else if (action == "PREVMAPTYPE"){
-                switchMapType(false,true)
-                saveSettings()
-                send_cur_map_link()
-            }
-
             else if (action == "EVENTMAP"){
                 document.getElementById("map_event_check_box").checked = !document.getElementById("map_event_check_box").checked
                 changeMap(document.getElementById('maps_list').querySelector('.selected_map'),all_maps[document.getElementById('maps_list').querySelector('.selected_map').id])
@@ -716,10 +700,10 @@ function link_link(reconnect = false){
                 }
             }
 
-            else if (action == "TIMER"){
-                let force_start = incoming_state.hasOwnProperty("reset") && incoming_state["reset"] ? true : false;
-                toggle_timer(force_start)
-                send_timer(force_start)
+            else if (action == "INTERACTION"){
+                let interaction = document.querySelector(`.cycler[data-name="${incoming_state['interaction']}"] .cycler-next`)
+                interaction.click()
+                filter()
             }
 
             else if (action == "COOLDOWNTIMER"){
@@ -734,81 +718,12 @@ function link_link(reconnect = false){
                 send_hunt_timer(force_start)
             }
 
-            else if (action == "SOUNDTIMER"){
-                let force_start = incoming_state.hasOwnProperty("reset") && incoming_state["reset"] ? true : false;
-                toggle_sound_timer(force_start)
-                send_sound_timer(force_start)
-            }
-
-            else if (action == "OBAMBOTIMER"){
-                toggle_obambo_timer()
-            }
-
             else if (action == "DL_STEP"){
                 if (incoming_state.hasOwnProperty("timestamp")){
                     bpm_tap(incoming_state["timestamp"])
                 }
                 else{
                     bpm_tap()
-                }
-            }
-
-            else if (action == "NEXTMODE"){
-                // Cycle
-                // NOMODIFIER -> BLOODMOON -> FORESTMINION -> BLOODMINION -> COAL -> BLOODCOAL -> <repeat>
-
-                bm = $("#blood-moon-icon").hasClass("blood-moon-active")
-                bma = $("#blood-moon-icon").css("display") != "none"
-                fm = $("#forest-minion-mod").text() != '0'
-                fma = $("#forest-minion-icon").css("display") != "none"
-                cm = $("#coal-icon").hasClass("coal-active")
-                cma = $("#coal-icon").css("display") != "none"
-
-                if (!bm && !fm && !cm){ // NOMODIFIER
-                    toggleBloodMoon(bma,!bma)
-                    toggleForestMinion(0,true,true)
-                    toggleCoal(false,true)
-                }
-                else if (bm && !fm && !cm){ // BLOODMOON
-                    toggleBloodMoon(false,true)
-                    toggleForestMinion(1,fma,!fma)
-                    toggleCoal(cma && !fma,!cma || fma)
-                }
-                else if (!bm && fm && !cm){ // FORESTMINION
-                    toggleBloodMoon(bma,!bma)
-                    toggleForestMinion(1,fma,!fma)
-                    toggleCoal(false,true)
-                }
-                else if (bm && fm && !cm){ // BLOODMINION
-                    toggleBloodMoon(false,true)
-                    toggleForestMinion(0,true,true)
-                    toggleCoal(cma,!cma)
-                }
-                else if (!bm && !fm && cm){ // COAL
-                    toggleBloodMoon(bma,!bma)
-                    toggleForestMinion(0,true,true)
-                    toggleCoal(cma,!cma)
-                }
-                else if (bm && !fm && cm){ // BLOODCOAL
-                    toggleBloodMoon(false,true)
-                    toggleForestMinion(0,true,true)
-                    toggleCoal(false,true)
-                }
-                send_modifier_link()
-            }
-
-            else if (action == "SANITY"){
-                if(incoming_state['value'].toUpperCase() == "TOGGLE"){
-                    toggle_sanity_drain()
-                }
-                else if(incoming_state['value'].toUpperCase() == "RESTORE"){
-                    restore_sanity()
-                }
-                else if(incoming_state['value'].toUpperCase() == "RESET"){
-                    reset_sanity()
-                }
-                else{
-                    adjust_sanity(parseInt(incoming_state['value']))
                 }
             }
 
@@ -935,6 +850,7 @@ function send_ghost_data_link(ghost){
         data = data.replace(`${lang_data['{{hunt_sanity}}']}`,`\n<b>${lang_data['{{hunt_sanity}}']}:<b>\n`)
         data = data.replace(`${lang_data['{{hunt_speed}}']}`,`\n<b>${lang_data['{{hunt_speed}}']}:<b>\n`)
         data = data.replace(`${lang_data['{{evidence}}']}`,`\n<b>${lang_data['{{evidence}}']}:<b>\n`)
+        data = data.replace(`${lang_data['{{interactions}}']}`,`\n<b>${lang_data['{{interactions}}']}:<b>\n`)
         data = data.replace(`\n[${lang_data['{{known_bugs}}']}]`,'')
         data = data.replace(`\n[${lang_data['{{more_details}}']}]`,'')
         data = data.replace(`Tests >>\n`,"")
@@ -973,6 +889,7 @@ function send_ghost_tests_link(ghost){
         data = data.replaceAll(`\n\n${lang_data['{{tell}}']} (`,`\n${lang_data['{{tell}}']} (`)
         data = data.replaceAll(`\n\n${lang_data['{{behavior}}']} (`,`\n${lang_data['{{behavior}}']} (`)
         data = data.replaceAll(`\n\n${lang_data['{{ability}}']} (`,`\n${lang_data['{{ability}}']} (`)
+        data = data.replaceAll(`\n\n${lang_data['{{interaction}}']} (`,`\n${lang_data['{{interaction}}']} (`)
         data = data.replaceAll("<b>\n\n","<b>\n").trim()
         
 
@@ -1013,33 +930,46 @@ function send_ghosts_link(reset = false){
     }
 }
 
-function send_modifier_link(){
-    if(hasDLLink){
-        bm = $("#blood-moon-icon").hasClass("blood-moon-active") && $("#blood-moon-icon").css("display") != "none"
-        fm = $("#forest-minion-mod").text() != '0' && $("#minion-icon").css("display") != "none"
-        cm = $("#coal-icon").hasClass("coal-active") && $("#coal-icon").css("display") != "none"
-
-        if(!bm && !fm && !cm)
-            dlws.send(`{"action":"BLOODMOON","value":0}`)
-        else if(bm && !fm && !cm)
-            dlws.send(`{"action":"BLOODMOON","value":1}`)
-        else if(!bm && fm && !cm)
-            dlws.send(`{"action":"FORESTMINION","value":1}`)
-        else if(bm && fm && !cm)
-            dlws.send(`{"action":"BLOODMINION","value":1}`)
-        else if(!bm && !fm && cm)
-            dlws.send(`{"action":"COAL","value":1}`)
-        else if(bm && !fm && cm)
-            dlws.send(`{"action":"BLOODCOAL","value":1}`)
-
-        else
-            console.log("Error: Impossible modifier!")
-    }
-}
-
 function send_sanity_link(value, color){
     if(hasDLLink){
         dlws.send(`{"action":"SANITY","value":${value},"color":"${color}"}`)
+    }
+}
+
+function send_interaction_link(reset = false){
+    let candle_states = {
+        "-":" ",
+        "candle_blow_out":"+",
+        "candle_no_interaction":"-"
+    }
+    let rem_states = {
+        "-":" ",
+        "rem_interacts":"+",
+        "rem_no_interaction":"-"
+    }
+    let light_states = {
+        "-":" ",
+        "light_on_only":"+",
+        "light_off_only":"-",
+        "light_on_off":"+/-"
+    }
+    let radio_states = {
+        "-":" ",
+        "radio_on_only":"+",
+        "radio_off_only":"-",
+        "radio_on_off":"+/-"
+    }
+    if(hasDLLink){
+        if (reset){
+            dlws.send(`{"action":"INTERACTIONS","message":"Candles: ,Lights: ,Radio: ,REM: "}`)
+            return
+        }
+        var ilist = "";
+        ilist += "Candles:" + candle_states[document.querySelector('.cycler[data-name="candle-interaction"] input').value] + ",";
+        ilist += "Lights:" + light_states[document.querySelector('.cycler[data-name="light-interaction"] input').value] + ",";
+        ilist += "Radio:" + radio_states[document.querySelector('.cycler[data-name="radio-interaction"] input').value] + ",";
+        ilist += "REM:" + rem_states[document.querySelector('.cycler[data-name="rem-interaction"] input').value]
+        dlws.send(`{"action":"INTERACTIONS","message":"${ilist}"}`)
     }
 }
 
@@ -1047,7 +977,7 @@ function send_map_preload_link(){
     if(hasDLLink){
         let non_event_maps = Object.entries(all_maps).filter(([key]) => !key.endsWith('-e')).map(([, value]) => value).join('","');
         cur_map_link = document.getElementById("map_image").style.backgroundImage.slice(4,-1).replace(/"/g,"")
-        dlws.send(`{"action":"MAPPRELOAD","message":"${cur_map_link}","list":["${Object.values(all_maps).join('","')}","${non_event_maps.replaceAll(".png","_sanity.png").replaceAll(".webp","_sanity.webp")}","${non_event_maps.replaceAll(".png","_temperature.png").replaceAll(".webp","_temperature.webp")}"]}`)
+        dlws.send(`{"action":"MAPPRELOAD","message":"${cur_map_link}","list":["${Object.values(all_maps).join('","')}"]}`)
     }
 
 }
@@ -1076,11 +1006,10 @@ function send_reset_link(){
         send_ghost_link("",0)
         send_ghosts_link(true)
         send_evidence_link(true)
+        send_interaction_link(true)
         send_bpm_link("-","-","100%")
-        send_timer_link("TIMER_VAL","0:00")
         send_timer_link("COOLDOWN_VAL","0:00")
         send_timer_link("HUNT_VAL","0:00")
-        send_timer_link("SOUND_VAL","0:00")
         send_empty_data_link()
         dlws.send('{"action":"REQUESTRESET"}')
         dlws.send('{"action":"UNLINK"}')
@@ -1146,13 +1075,6 @@ function disconnect_link(reset = false, has_status = false, code = 1005, reason 
     console.log("[WS] Disconnect complete");
 }
 
-
-function send_timer(force_start = false, force_stop = false){
-    if(hasLink){
-        ws.send(`{"action":"TIMER","force_start":${force_start},"force_stop":${force_stop}}`)
-    }
-}
-
 function send_cooldown_timer(force_start = false, force_stop = false){
     if(hasLink){
         ws.send(`{"action":"COOLDOWNTIMER","force_start":${force_start},"force_stop":${force_stop}}`)
@@ -1162,12 +1084,6 @@ function send_cooldown_timer(force_start = false, force_stop = false){
 function send_hunt_timer(force_start = false, force_stop = false){
     if(hasLink){
         ws.send(`{"action":"HUNTTIMER","force_start":${force_start},"force_stop":${force_stop}}`)
-    }
-}
-
-function send_sound_timer(force_start = false, force_stop = false){
-    if(hasLink){
-        ws.send(`{"action":"SOUNDTIMER","force_start":${force_start},"force_stop":${force_stop}}`)
     }
 }
 

@@ -525,7 +525,7 @@ function filter(ignore_link=false){
     }
 
     // Get values of checkboxes
-    var base_speed = 2.35;
+    var base_speed = 2.42;
     var ghost_array = [];
     var evi_array = [];
     var not_evi_array = [];
@@ -748,10 +748,10 @@ function filter(ignore_link=false){
 
         //Check for speed
         if(selected_speed != "-"){
-            if (selected_speed == "speed_normal" && speed != 2.35){
+            if (selected_speed == "speed_normal" && speed != 2.42){
                 keep = false
             }
-            else if (selected_speed == "speed_fast" && speed <= 2.35){
+            else if (selected_speed == "speed_fast" && speed <= 2.42){
                 keep = false
             }
         }
@@ -762,13 +762,13 @@ function filter(ignore_link=false){
             if (selected_los_speed == "los_slow" && los_speed != 2.0){
                 keep = false
             }
-            else if (selected_los_speed == "los_normal" && los_speed != 2.35){
+            else if (selected_los_speed == "los_normal" && los_speed != 2.5){
                 keep = false
             }
-            else if (selected_los_speed == "los_medium" && los_speed != 2.55){
+            else if (selected_los_speed == "los_medium" && los_speed != 2.7){
                 keep = false
             }
-            else if (selected_los_speed == "los_fast" && los_speed != 2.85){
+            else if (selected_los_speed == "los_fast" && los_speed != 3.1){
                 keep = false
             }
         }
@@ -994,7 +994,7 @@ function filter(ignore_link=false){
     setCookie("tos_state",JSON.stringify(state),1)
     updateScaling()
     if (hasLink && !ignore_link){send_state()}
-    if (hasDLLink){send_evidence_link(); send_ghosts_link();}
+    if (hasDLLink){send_evidence_link(); send_ghosts_link(); send_interaction_link();}
 }
 
 function prioritySort(){
