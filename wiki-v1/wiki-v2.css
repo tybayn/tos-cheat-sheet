@@ -47,6 +47,11 @@
     color: #00ff00;
 }
 
+.wiki-img{
+    cursor: zoom-in;
+    margin: 10px 0px;
+}
+
 .fade{
     opacity: 0.4;
 }
@@ -296,6 +301,7 @@
         padding: 0;
         margin: 0;
         margin-top: 10px;
+        margin-bottom: 10px;
     }
 
     .wiki_details img{

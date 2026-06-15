@@ -2,5 +2,33 @@
     "{{wiki_coming_soon}}": "Coming Soon...",
     "{{wiki_0_evidence}}": "0 Evidence",
 
-    "{{wiki_additional_ghost_data}}": "Coming Soon..."
+    "{{wiki_additional_ghost_data}}": "Additional Ghost Data",
+
+    "{{wiki_iblis_shapeshift_title}}": "Shapeshifting",
+    "{{wiki_iblis_shapeshift_p1}}": "During hunts, the Iblis will change the cosmetic of the current model various times throughout the hunt for a couple of blinks at a time. The model itself remains the same during these changes.",
+    "{{wiki_iblis_shapeshift_p2}}": "Since each map has its own model, the cosmetic changes vary. Below is a list of the Iblis model changes for each map:",
+    "{{wiki_iblis_shapeshift_h3}}": "12 Ravenwood Lane",
+    "{{wiki_iblis_shapeshift_p3}}": "Model: Gary (Jester/Clown)",
+    "{{wiki_iblis_shapeshift_h4}}": "1205 Cedar Street",
+    "{{wiki_iblis_shapeshift_p4}}": "Model: Jebadiah (Junkie/Drug Addict)",
+    "{{wiki_iblis_shapeshift_h5}}": "317 Aspen Heights",
+    "{{wiki_iblis_shapeshift_p5}}": "Model: Jennifer (Captive)",
+    "{{wiki_iblis_shapeshift_h6}}": "Stone Manor Plantation",
+    "{{wiki_iblis_shapeshift_p6}}": "Model: Victoria (Goth Bride)",
+    "{{wiki_iblis_shapeshift_h7}}": "St. Joseph's Orphanage",
+    "{{wiki_iblis_shapeshift_p7}}": "Model: Henry (School Boy)",
+    "{{wiki_iblis_shapeshift_h8}}": "Summerhill Psychiatric Institution",
+    "{{wiki_iblis_shapeshift_p8}}": "Model: Stevie (Patient 0057)",
+    "{{wiki_iblis_shapeshift_h9}}": "Abaddon Hallows East / West",
+    "{{wiki_iblis_shapeshift_p9}}": "Model: Abigail (Nun)",
+
+    "{{wiki_skia_audio_title}}": "Spirit Box Responses",
+    "{{wiki_skia_audio_p1}}": "The Skia has unique responses that it gives to the player through the spirit box. Below is a list of those unique responses:",
+    "{{wiki_skia_audio_li1}}": "That wasn't very friendly.",
+    "{{wiki_skia_audio_li2}}": "I don't wanna do any of this.",
+    "{{wiki_skia_audio_li3}}": "Don’t be afraid, it will be over soon.",
+    "{{wiki_skia_audio_li4}}": "I don’t want to hurt you.",
+    "{{wiki_skia_audio_li5}}": "Hm. I’m very sorry, dear stranger.",
+    "{{wiki_skia_audio_li6}}": "You have to be quiet.",
+    "{{wiki_skia_audio_p2}}": "This list is not exhaustive and more responses may be added in the future as they are discovered."
 }

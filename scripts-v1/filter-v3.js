@@ -12,7 +12,7 @@ let bpm_list = []
 let bpm_los_list = []
 
 var state = {"evidence":{},"speed":"-","los_speed":"-","holy_water":"-","candle_interaction":"-","rem_interaction":"-","light_interaction":"-","radio_interaction":"-","ghosts":{},"map":"ravenwood","map_size":"M"}
-var user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
+var user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
 
 let znid = getCookie("tos_znid")
 
@@ -1500,6 +1500,7 @@ function saveSettings(reset = false){
     user_settings['adaptive_evidence'] = document.getElementById("adaptive_evidence").checked ? 1 : 0;
     user_settings['hide_descriptions'] = document.getElementById("hide_descriptions").checked ? 1 : 0;
     user_settings['layout'] = document.getElementById("card_format").value
+    user_settings['hide_sanity_speed'] = document.getElementById("hide_sanity_speed").checked ? 1 : 0;
     user_settings['offset'] = parseFloat(document.getElementById("offset_value").innerText.replace(/\d+(?:-\d+)+/g,"")).toFixed(1)
     user_settings['num_evidences'] = document.getElementById("num_evidence").value
     user_settings['bpm_type'] = document.getElementById("bpm_type").checked ? 1 : 0;
@@ -1522,7 +1523,7 @@ function loadSettings(){
     try{
         user_settings = JSON.parse(getCookie("tos_settings"))
     } catch (error) {
-        user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
+        user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
     }
 
     user_settings['num_evidences'] = user_settings['num_evidences'] == "" ? "3" : user_settings['num_evidences']
@@ -1537,6 +1538,7 @@ function loadSettings(){
     document.getElementById("adaptive_evidence").checked = load_default('adaptive_evidence',0) == 1
     document.getElementById("hide_descriptions").checked = load_default('hide_descriptions',0) == 1
     document.getElementById("card_format").value = load_default('layout',0)
+    document.getElementById("hide_sanity_speed").checked = load_default('hide_sanity_speed',0) == 1
     document.getElementById("offset_value").innerText = ` ${load_default('offset',0.0)}% `
 
     if(Array.from(document.getElementById("num_evidence").options).map(option => option.value).includes(load_default('num_evidences','3')))
@@ -1601,6 +1603,7 @@ function loadSettings(){
     setCookie("tos_settings",JSON.stringify(user_settings),30)
 
     toggleDescriptions()
+    toggleSanitySpeed(document.getElementById("hide_sanity_speed").checked)
     changeLayout()
     toggleKeepAlive(document.getElementById("keep_alive"))
     changeTheme(user_settings['theme'])
@@ -1621,7 +1624,7 @@ function loadSettings(){
 }
 
 function resetSettings(){
-    user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
+    user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
     document.getElementById("modifier_volume").value = load_default('volume',50)
     document.getElementById("mute_broadcast").checked = load_default('mute_broadcast',0) == 1 
     document.getElementById("mute_timer_toggle").checked = load_default('mute_timer_toggle',0) == 1 
@@ -1632,6 +1635,7 @@ function resetSettings(){
     document.getElementById("adaptive_evidence").checked = load_default('adaptive_evidence',0) == 1
     document.getElementById("hide_descriptions").checked = load_default('hide_descriptions',0) == 1
     document.getElementById("card_format").value = load_default('layout',0)
+    document.getElementById("hide_sanity_speed").checked = load_default('hide_sanity_speed',0) == 1
     document.getElementById("offset_value").innerText = ` ${load_default('offset',0.0)}% `
     document.getElementById("num_evidence").value = load_default('num_evidences','3')
     document.getElementById("bpm_type").checked = load_default('bpm_type',0) == 1
@@ -1656,41 +1660,6 @@ function resetSettings(){
         blood_moon = 0
     }
     setCookie("tos_settings",JSON.stringify(user_settings),30)
-}
-
-function toggleSanitySettings(){
-
-    if (document.getElementById("num_evidence").value == "-1"){
-        $("#cust_starting_sanity").removeAttr("disabled")
-        $("#cust_sanity_pill_rest").removeAttr("disabled")
-        $("#cust_sanity_drain").removeAttr("disabled")
-        $("#cust_lobby_type").removeAttr("disabled")
-        $("#cust_starting_sanity").removeClass("option-disabled")
-        $("#cust_sanity_pill_rest").removeClass("option-disabled")
-        $("#cust_sanity_drain").removeClass("option-disabled")
-        $("#cust_lobby_type").removeClass("option-disabled")
-
-    }
-    else {
-        $("#cust_starting_sanity").attr("disabled","disabled")
-        $("#cust_sanity_pill_rest").attr("disabled","disabled")
-        $("#cust_sanity_drain").attr("disabled","disabled")
-        $("#cust_lobby_type").removeAttr("disabled")
-        $("#cust_starting_sanity").addClass("option-disabled")
-        $("#cust_sanity_pill_rest").addClass("option-disabled")
-        $("#cust_sanity_drain").addClass("option-disabled")
-        $("#cust_lobby_type").removeClass("option-disabled")
-    }
-}
-
-function highlightWeekly(){
-
-    setTimeout(() => {
-        $("#weekly_icon").addClass("icon-flash")
-        setTimeout(() =>{
-            $("#weekly_icon").removeClass("icon-flash")
-        },2000)
-    },1500)
 }
 
 function checkDifficulty(){
@@ -1769,6 +1738,24 @@ function toggleDescriptions(forced = null){
         $(".ghost_behavior").removeClass(["ghost_behavior_hidden"])
     }
     changeLayout()
+}
+
+function toggleSanitySpeed(forced=null){
+    if (forced == false){
+        document.getElementById("hide_sanity_speed").checked = false
+        $(".ghost_hunt_info").addClass("ghost_info_lock")
+    }
+    else if (forced == true){
+        document.getElementById("hide_sanity_speed").checked = true
+        $(".ghost_hunt_info").removeClass("ghost_info_lock")
+    }
+
+    if(document.getElementById("hide_sanity_speed").checked){
+        $(".ghost_hunt_info").removeClass("ghost_info_lock")
+    }
+    else{
+        $(".ghost_hunt_info").addClass("ghost_info_lock")
+    }
 }
 
 function changeLayout(){

@@ -33,6 +33,13 @@ function checkLink(){
             
         }
 
+        if (params.get("reset")){
+            setCookie("tos_state","",-1)
+            setCookie("tos_settings","",-1)
+            window.location.href = window.location.href.split("?")[0]
+            
+        }
+
         if (params.get('journal')){
             setCookie("tos_room_id",params.get('journal'),1)
             window.location.href = window.location.href.split("?")[0]
