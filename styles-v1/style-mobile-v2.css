@@ -2307,20 +2307,30 @@
         height: 100px;
     }
 
+    .los_range_icon{
+        height: 60px !important; 
+        width: 60px !important; 
+        margin: -6px 0px -10px 0px;
+    }
+
     .ghost_speed img{
         height: 40px;
         cursor: pointer;
     }
 
-    .footstep_los{
+    .footstep_los, .holy_cooldown_los{
         display: flex;
         flex-direction: column;
         margin-right: 10px;
     }
 
-    .footstep_los img{
+    .footstep_los img, .holy_cooldown_los img{
         width: 45px;
         height: 45px;
+    }
+
+    .speed_spacer{
+        width: 9px;
     }
 
     .no-los, .no-los .ms{

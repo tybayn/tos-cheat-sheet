@@ -23,6 +23,12 @@
     "{{los_medium}}": "Medium <span class=\"hunt_sanity_num\">2.70m/s</span>",
     "{{los_fast}}": "Fast <span class=\"hunt_sanity_num\">3.10m/s</span>",
 
+    "{{los_range_0}}": "None",
+    "{{los_range_1}}": "Low",
+    "{{los_range_2}}": "Medium",
+    "{{los_range_3}}": "High",
+    "{{los_range_4}}": "Very High",
+
     "{{candles}}": "Candles",
     "{{candle_blow_out}}": "Blow Out",
     "{{candle_no_interaction}}": "No Interaction",

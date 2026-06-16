@@ -22,6 +22,13 @@ evi_icons = {
     "Writing": "imgs/writing-icon.png",
 }
 
+los_range = [
+    "{{los_range_0}}",
+    "{{los_range_1}}",
+    "{{los_range_2}}",
+    "{{los_range_3}}",
+    "{{los_range_4}}"
+]
 
 class Ghost {
     constructor(data,evidence){
@@ -33,15 +40,15 @@ class Ghost {
                 <div class="ghost_hunt_entry ${data.speed > 2.42 ? 'high' : data.speed < 2.42 ? 'low' : ''}">
                     <div class="footstep_los">
                         <img src="imgs/footsteps.png" style="filter: invert(1);">
-                        <img src="imgs/los.png" title="LOS Speed" style="margin-bottom: -5px; opacity: 0.7;">
+                        <img src="imgs/los-${data.los_range}.png" class="los_range_icon" title="LOS Speed | Range: ${los_range[data.los_range]}">
                     </div>
                     <div class="ghost_hunt_values">
                         <div class="speed_item">${parseFloat(data.speed).toFixed(2)}<span class="ms">m/s</span><span class="sound" onclick="toggleSound(${data.speed},'${data.ghost}0')">&#128266;</span></div>
-                        <div class="speed_item_alt" style="opacity: 0.7;">${parseFloat(data.los_speed).toFixed(2)}<span class="ms">m/s</span></div>
+                        <div class="speed_item_alt" style="opacity: 0.7;"><div class="speed_spacer"></div>${parseFloat(data.los_speed).toFixed(2)}<span class="ms">m/s</span></div>
                     </div>
                 </div>
                 <div class="ghost_hunt_entry ${data.holy_water > 3 ? 'low' : data.holy_water < 3 ? 'high' : ''}">
-                    <div class="footstep_los">
+                    <div class="holy_cooldown_los">
                         <img src="imgs/holy-water.png" title="Holy Water Duration">
                     </div>
                     <div class="ghost_hunt_values_h">
@@ -49,7 +56,7 @@ class Ghost {
                     </div>
                 </div>
                 <div class="ghost_hunt_entry ${data.cooldown > 60 ? 'low' : data.cooldown < 60 ? 'high' : ''}">
-                    <div class="footstep_los">
+                    <div class="holy_cooldown_los">
                         <img src="imgs/stopwatch.png" title="Cooldown Duration">
                     </div>
                     <div class="ghost_hunt_values_h">
