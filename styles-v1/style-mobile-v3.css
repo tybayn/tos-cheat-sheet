@@ -2612,7 +2612,7 @@
         font-size: 27px;
     }
 
-    .tricheck{
+    .tricheck, .quadcheck{
         border: 0;
         width: 100%;
         background:none;
@@ -2753,6 +2753,32 @@
         background-color: #313248;
         left:10px;
         top:26px;
+    }
+
+    .maybe{
+        background-color: #ccc;
+        border-color: #dac400 !important;
+    }
+
+    .maybe .icon{
+        display:inline-block;
+        width: 25px;
+        height:25px;
+        margin-top: -23px;
+        margin-left: -3px;
+        -ms-transform: rotate(90deg); /* IE 9 */
+        -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
+        transform: rotate(90deg);
+    }
+
+    .maybe .icon:before{
+        content:"";
+        position: absolute;
+        width:7px;
+        height:30px;
+        background-color: #313248;
+        left:21px;
+        top:-4px;
     }
 
     .bad{

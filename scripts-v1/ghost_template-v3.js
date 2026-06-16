@@ -109,9 +109,8 @@ class Ghost {
         `
     }
 
-    build_evidence_item(evidence,evidence_name,wordless=false){
-        
-        return `<div class="ghost_evidence_item" ${evidence in evi_color ? 'style=\"color:' + evi_color[evidence] + ' !important;\"' : ''} name="${evidence}"><img src="${evi_icons[evidence]}">${wordless ? '' : evidence_name}</div>`
+    build_evidence_item(evidence,evidence_ranges,wordless=false){
+        return `<div class="ghost_evidence_item" ${evidence in evi_color ? 'style=\"color:' + evi_color[evidence] + ' !important;\"' : ''} name="${evidence}"><img src="${evi_icons[evidence]}">${wordless ? '' : evidence}</div>`
     }
 
     build_tells(candles,rem,lights,radios,tells,behavior,abilities,interactions){

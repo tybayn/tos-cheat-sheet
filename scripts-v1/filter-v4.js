@@ -129,24 +129,43 @@ function tristate(elem,ignore_link=false){
 
     if (checkbox.hasClass("neutral")){
         checkbox.removeClass("neutral")
-        if(id == "LOS" && all_not_los())
-        {
-            checkbox.addClass("bad")
-            label.addClass("strike")
-        }
-        else
-            checkbox.addClass("good")
+        checkbox.addClass("good")
     }
     else if (checkbox.hasClass("good")){
         checkbox.removeClass("good")
-        if(id == "LOS" && all_los()){
-            checkbox.addClass("neutral")
-        }
-        else{
-            checkbox.addClass("bad")
-            label.addClass("strike")
-        }
-        
+        checkbox.addClass("bad")
+        label.addClass("strike")
+    }
+    else if (checkbox.hasClass("bad")){
+        checkbox.removeClass("bad")
+        label.removeClass("strike")
+        checkbox.addClass("neutral")
+    }
+
+    if(!ignore_link){filter(ignore_link)}
+}
+
+function quadstate(elem,ignore_link=false){
+    var checkbox = $(elem).find("#checkbox");
+    var label = $(elem).find(".label");
+    var id  = $(elem).attr("id")
+
+    if (checkbox.hasClass("disabled") || checkbox.hasClass("block")){
+        return;
+    }
+
+    if (checkbox.hasClass("neutral")){
+        checkbox.removeClass("neutral")
+        checkbox.addClass("good")
+    }
+    else if (checkbox.hasClass("good")){
+        checkbox.removeClass("good")
+        checkbox.addClass("maybe")
+    }
+    else if (checkbox.hasClass("maybe")){
+        checkbox.removeClass("maybe")
+        checkbox.addClass("bad")
+        label.addClass("strike")
     }
     else if (checkbox.hasClass("bad")){
         checkbox.removeClass("bad")

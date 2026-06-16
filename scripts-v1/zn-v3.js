@@ -167,15 +167,38 @@ function loadAllAndConnect(){
                 var wiki = document.getElementById('wiki-0-evidence-data')
                 var cur_version = document.getElementById('current-version-label')
                 var evidence_list = document.getElementById('evidence')
+                var evidence_list_fake = document.getElementById('evidence-fake')
+                var evidence_list_cleanse = document.getElementById('evidence-cleanse')
         
                 evidence_list.innerHTML = "";
+                evidence_list_fake.innerHTML = "";
+                evidence_list_cleanse.innerHTML = "";
+
                 Object.entries(data.evidence).forEach(([key,value]) => {
                     evidence_list.innerHTML += `
                     <div class="evidence-row">
                         <button id="${key}" class="tricheck white" name="evidence" onclick="tristate(this)" value="${key}">
                             <div id="checkbox" class="neutral"><span class="icon"></span></div>
-                            <div class="label">${value}</div>
+                            <div class="label">${key}</div>
                         </button>
+                    </div>
+                    `
+                    evidence_list_fake.innerHTML += `
+                    <div class="evidence-row">
+                        <button id="${key}" class="tricheck white" name="evidence" onclick="quadstate(this)" value="${key}">
+                            <div id="checkbox" class="neutral"><span class="icon"></span></div>
+                            <div class="label">${key}</div>
+                        </button>
+                    </div>
+                    `
+                    evidence_list_cleanse.innerHTML += `
+                    <div class="cycler" data-name="speed" data-options='["-",${Array.from(value).map(e => `"${e}"`).join(",")}]' data-current="0">
+                        <div class="cycler-label">${key}</div>
+                        <button class="cycler-prev" type="button">&lt;</button>
+                        <div class="cycler-value"></div>
+                        <button class="cycler-next" type="button">&gt;</button>
+                        <input type="hidden">
+                        <div class="cycler-counter"></div>
                     </div>
                     `
                 })
