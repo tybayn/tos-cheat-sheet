@@ -335,9 +335,14 @@ function link_room(){
                     send_ml_state()
                 }
                 if (action == "EVIDENCE"){
-                    if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
-                        tristate(document.getElementById(incoming_state['evidence']))
-                    }
+                    if (difficulties[user_settings['num_evidences']].fake > 0 )
+                        if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
+                            quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                        }
+                    else
+                        if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
+                            tristate(document.getElementById(incoming_state['evidence']))
+                        }
                 }
                 if (action == "POLL"){
                     polled = true
@@ -378,6 +383,7 @@ function link_room(){
                 ){
                     if(incoming_state['settings']['num_evidences'] != "")
                         document.getElementById("num_evidence").value = incoming_state['settings']['num_evidences']
+                    checkDifficulty(document.getElementById("num_evidence"))
                     updateMapDifficulty(incoming_state['settings']['num_evidences'])
                     flashMode()
                 }
@@ -437,10 +443,14 @@ function link_room(){
 
                 var prev_evidence = state['evidence']
                 for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
-                    while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
-                        tristate(document.getElementById(key),true);
-                    }
-                    
+                    if(difficulties[incoming_state['settings']['num_evidences']].fake > 0)
+                        while (!$(document.getElementById(key+"-fake").querySelector("#checkbox")).hasClass(["bad","neutral","good","maybe"][value + 1])){
+                            quadstate(document.getElementById(key+"-fake"),true);
+                        }
+                    else
+                        while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
+                            tristate(document.getElementById(key),true);
+                        }
                 }
 
                 setCyclerValue("speed",incoming_state["speed"])
@@ -755,9 +765,14 @@ function link_link(reconnect = false){
             }
             
             else if (action == "EVIDENCE"){
-                if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
-                    tristate(document.getElementById(incoming_state['evidence']))
-                }
+                if (difficulties[user_settings['num_evidences']].fake > 0 )
+                    if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
+                        quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                    }
+                else
+                    if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
+                        tristate(document.getElementById(incoming_state['evidence']))
+                    }
             }
 
             else if (action == "UNLINK"){

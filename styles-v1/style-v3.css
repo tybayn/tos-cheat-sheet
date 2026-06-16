@@ -2918,7 +2918,7 @@ body{
         width: 17px;
     }
 
-    .ghost_nightmare_evidence, .ghost_hunt_high, .ghost_hunt_low, .ghost_has_los{
+    .ghost_forced_evidence{
         display: none;
     }
 

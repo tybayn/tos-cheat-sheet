@@ -156,6 +156,12 @@ function loadAllAndConnect(){
             lang = 'en'
         }
         try{
+            let dif_html = ""
+            for (const [key, value] of Object.entries(difficulties)) {
+                dif_html += `<option value="${key}">${value.name}</option>`
+            }
+            document.getElementById("num_evidence").innerHTML = dif_html
+
             fetch(`https://zero-network.net/the-other-side/data/ghosts.json?${ghost_version ? ('&version='+ghost_version) : ''}`, {cache: 'default', signal: AbortSignal.timeout(10000)})
             .then(data => data.json())
             .then(data => {
@@ -185,14 +191,14 @@ function loadAllAndConnect(){
                     `
                     evidence_list_fake.innerHTML += `
                     <div class="evidence-row">
-                        <button id="${key}" class="tricheck white" name="evidence" onclick="quadstate(this)" value="${key}">
+                        <button id="${key}-fake" class="tricheck white" name="evidence-fake" onclick="quadstate(this)" value="${key}">
                             <div id="checkbox" class="neutral"><span class="icon"></span></div>
                             <div class="label">${key}</div>
                         </button>
                     </div>
                     `
                     evidence_list_cleanse.innerHTML += `
-                    <div class="cycler" data-name="speed" data-options='["-",${Array.from(value).map(e => `"${e}"`).join(",")}]' data-current="0">
+                    <div class="cycler" data-name="${key}-cleanse" data-options='["-",${Array.from(value).map(e => `"${e}"`).join(",")}]' data-current="0">
                         <div class="cycler-label">${key}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -233,13 +239,35 @@ function loadAllAndConnect(){
                     var read_state = JSON.parse(raw_state)
                 }
 
+                let us = getCookie("tos_settings")
+                if (us && us != '' && us != null)
+                    us = JSON.parse(us)
+                else
+                    us = user_settings
+
                 for (const [key, value] of Object.entries(read_state["evidence"])){ 
-                    if (value == 1){
-                        tristate(document.getElementById(key));
+                    if (difficulties[legacy_correct[us['num_evidences']??'3N']??us['num_evidences']].fake > 0){
+                        if (value == 2){
+                            quadstate(document.getElementById(key+"-fake"));
+                        }
+                        else if (value == 1){
+                            quadstate(document.getElementById(key+"-fake"));
+                            quadstate(document.getElementById(key+"-fake"));
+                        }
+                        else if (value == -1){
+                            quadstate(document.getElementById(key+"-fake"));
+                            quadstate(document.getElementById(key+"-fake"));
+                            quadstate(document.getElementById(key+"-fake"));
+                        }
                     }
-                    else if (value == -1){
-                        tristate(document.getElementById(key));
-                        tristate(document.getElementById(key));
+                    else{
+                        if (value == 1){
+                            tristate(document.getElementById(key));
+                        }
+                        else if (value == -1){
+                            tristate(document.getElementById(key));
+                            tristate(document.getElementById(key));
+                        }
                     }
                 }
 

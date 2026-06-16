@@ -103,7 +103,7 @@ function updateMapSize(size){
 }
 
 function updateMapDifficulty(difficulty){
-    map_difficulty = {"3M":3,"3E":2,"3I":1,"3N":0}[difficulty]
+    map_difficulty = difficulties[difficulty].hunt
     document.getElementById("minute_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty][map_size]/60),2)
     document.getElementById("second_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty][map_size]) % 60,2)
     document.getElementsByClassName('hunt_size_label')[0].innerText = `${lang_data['{{map}}']}: ${["S","M","L","XL"][map_size]}, ${lang_data['{{hunt}}']}: ${["S","M","L","VL"][map_difficulty]}`

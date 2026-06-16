@@ -69,6 +69,7 @@ class Ghost {
                 ${this.build_evidence_item(data.evidence[1],evidence[data.evidence[1]],mquery.matches)}
                 ${this.build_evidence_item(data.evidence[2],evidence[data.evidence[2]],mquery.matches)}
             </div>
+            <div class="ghost_forced_evidence">${data.forced_evidence?data.forced_evidence:''}</div>
 
             <div class="ghost_behavior" onpointerup="doubleTap(toggleGhostExpand, event, this)">
                 <div class="ghost_evidence_internal">
@@ -117,16 +118,16 @@ class Ghost {
         var data = `<div class="interaction-icons">`
     
         if (candles != null)
-            data += `<div class="interaction-item"><img src="imgs/candle-icon.png">${candles}</div>`
+            data += `<div class="interaction-item"><img title="Candle Interaction" src="imgs/candle-icon.png">${candles}</div>`
 
         if (rem != null)
-            data += `<div class="interaction-item"><img src="imgs/rem-icon.png">${rem}</div>`
+            data += `<div class="interaction-item"><img title="FLX-Pod Interaction" src="imgs/rem-icon.png">${rem}</div>`
 
         if (lights != null)
-            data += `<div class="interaction-item"><img src="imgs/bulb-icon.png">${lights}</div>`
+            data += `<div class="interaction-item"><img title="Light Interaction" src="imgs/bulb-icon.png">${lights}</div>`
 
         if (radios != null)
-            data += `<div class="interaction-item"><img src="imgs/radio-icon.png">${radios}</div>`
+            data += `<div class="interaction-item"><img title="Radio Interaction" src="imgs/radio-icon.png">${radios}</div>`
 
         data += `</div><ul>`
 
@@ -255,16 +256,16 @@ class Ghost {
         msg += `<div class='dtitle'><i>{{interactions}}</i><div class='ddash'></div></div><div class="interaction-icons">`
     
         if (value["candles"] != null)
-            msg += `<div class="interaction-item candle-interaction"><img alt="Candle Interaction" src="imgs/candle-icon.png">${value["candles"]}</div>`
+            msg += `<div class="interaction-item candle-interaction"><img title="Candle Interaction" src="imgs/candle-icon.png">${value["candles"]}</div>`
 
         if (value["rem"] != null)
-            msg += `<div class="interaction-item rem-interaction"><img alt="FLX-Pod Interaction" src="imgs/rem-icon.png">${value["rem"]}</div>`
+            msg += `<div class="interaction-item rem-interaction"><img title="FLX-Pod Interaction" src="imgs/rem-icon.png">${value["rem"]}</div>`
 
         if (value["lights"] != null)
-            msg += `<div class="interaction-item light-interaction"><img alt="Light Interaction" src="imgs/bulb-icon.png">${value["lights"]}</div>`
+            msg += `<div class="interaction-item light-interaction"><img title="Light Interaction" src="imgs/bulb-icon.png">${value["lights"]}</div>`
 
         if (value["radios"] != null)
-            msg += `<div class="interaction-item radio-interaction"><img alt="Radio Interaction" src="imgs/radio-icon.png">${value["radios"]}</div>`
+            msg += `<div class="interaction-item radio-interaction"><img title="Radio Interaction" src="imgs/radio-icon.png">${value["radios"]}</div>`
 
         msg += `</div>`
 

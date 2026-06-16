@@ -10,6 +10,19 @@ let all_ghosts = {}
 let all_maps = {}
 let bpm_list = []
 let bpm_los_list = []
+let difficulties = {
+    "3N":{"evi":3,"fake":0,"name":"{{novice}}", "hunt": 1},
+    "3I":{"evi":3,"fake":0,"name":"{{intermediate}}", "hunt": 1},
+    "2E":{"evi":2,"fake":1,"name":"{{expert}}", "hunt": 1},
+    "1M":{"evi":1,"fake":2,"name":"{{master}}", "hunt": 2},
+    "2F":{"evi":2,"fake":1,"name":"{{forensic_lockdown}}", "hunt": 1},
+    "3S":{"evi":3,"fake":1,"name":"{{streamer_bait}}", "hunt": 1},
+    "1MA":{"evi":1,"fake":0,"name":"{{masochist}}", "hunt": 2}
+}
+let legacy_correct = {
+    "3E":"2E",
+    "3M":"1M"
+}
 
 var state = {"evidence":{},"speed":"-","los_speed":"-","holy_water":"-","candle_interaction":"-","rem_interaction":"-","light_interaction":"-","radio_interaction":"-","ghosts":{},"map":"ravenwood","map_size":"M"}
 var user_settings = {"num_evidences":"3N","volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
@@ -44,6 +57,7 @@ function waitForElementById(id){
     }
     return wait_for_element()
 }
+
 
 function showMenu(){
     mquery = window.matchMedia("screen and (pointer: coarse) and (max-device-width: 600px)")
@@ -145,7 +159,7 @@ function tristate(elem,ignore_link=false){
     if(!ignore_link){filter(ignore_link)}
 }
 
-function quadstate(elem,ignore_link=false){
+function quadstate(elem,ignore_link=false,skip_good_if_maxed=true){
     var checkbox = $(elem).find("#checkbox");
     var label = $(elem).find(".label");
     var id  = $(elem).attr("id")
@@ -154,16 +168,25 @@ function quadstate(elem,ignore_link=false){
         return;
     }
 
+    var num_evi = difficulties[document.getElementById("num_evidence").value].evi;
+    var evi_type = difficulties[document.getElementById("num_evidence").value].fake > 0 ? '-fake' : '';
+    var num_good = document.querySelectorAll(`[name="evidence${evi_type}"] .good`).length;
+
     if (checkbox.hasClass("neutral")){
         checkbox.removeClass("neutral")
-        checkbox.addClass("good")
-    }
-    else if (checkbox.hasClass("good")){
-        checkbox.removeClass("good")
         checkbox.addClass("maybe")
     }
     else if (checkbox.hasClass("maybe")){
         checkbox.removeClass("maybe")
+        if (skip_good_if_maxed && num_good >= num_evi){
+            checkbox.addClass("bad")
+            label.addClass("strike")
+        }
+        else
+            checkbox.addClass("good")
+    }
+    else if (checkbox.hasClass("good")){
+        checkbox.removeClass("good")
         checkbox.addClass("bad")
         label.addClass("strike")
     }
@@ -547,32 +570,37 @@ function filter(ignore_link=false){
     var base_speed = 2.42;
     var ghost_array = [];
     var evi_array = [];
+    var may_evi_array = [];
     var not_evi_array = [];
-    
-    var good_checkboxes = document.querySelectorAll('[name="evidence"] .good');
-    var bad_checkboxes = document.querySelectorAll('[name="evidence"] .bad');
-    var speed_checkboxes = document.querySelectorAll('[name="speed"] .good');
-    var los_speed_checkboxes = document.querySelectorAll('[name="losspeed"] .good');
-    var holy_water_checkboxes = document.querySelectorAll('[name="holywater"] .good');
-    
+
     var num_evidences = document.getElementById("num_evidence").value
+    let evi_type = difficulties[num_evidences].fake > 0 ? '-fake' : '';
+    
+    var good_checkboxes = document.querySelectorAll(`[name="evidence${evi_type}"] .good`);
+    var bad_checkboxes = document.querySelectorAll(`[name="evidence${evi_type}"] .bad`);
+    var maybe_checkboxes = document.querySelectorAll(`[name="evidence${evi_type}"] .maybe`);
+    var speed_checkboxes = document.querySelectorAll(`[name="speed"] .good`);
+    var los_speed_checkboxes = document.querySelectorAll(`[name="losspeed"] .good`);
+    var holy_water_checkboxes = document.querySelectorAll(`[name="holywater"] .good`);
+    
+    
 
     for (var i = 0; i < good_checkboxes.length; i++) {
-        if (num_evidences == "0" && good_checkboxes[i].parentElement.value != "Ghost Orbs"){
-            good_checkboxes[i].parentElement.classList.remove("good")
-            good_checkboxes[i].parentElement.classList.add("neutral")
-            state["evidence"][good_checkboxes[i].parentElement.value] = 0;
-        }
-        else{
-            evi_array.push(good_checkboxes[i].parentElement.value);
-            state["evidence"][good_checkboxes[i].parentElement.value] = 1;
-        }
+        evi_array.push(good_checkboxes[i].parentElement.value);
+        state["evidence"][good_checkboxes[i].parentElement.value] = 1;
     }
 
     for (var i = 0; i < bad_checkboxes.length; i++) {
         not_evi_array.push(bad_checkboxes[i].parentElement.value);
         state["evidence"][bad_checkboxes[i].parentElement.value] = -1;
     }
+
+    for (var i = 0; i < maybe_checkboxes.length; i++) {
+        may_evi_array.push(maybe_checkboxes[i].parentElement.value);
+        state["evidence"][maybe_checkboxes[i].parentElement.value] = 2;
+    }
+
+    var maxed = may_evi_array.length + evi_array.length == difficulties[num_evidences].evi + difficulties[num_evidences].fake
 
     var selected_speed = document.querySelector('.cycler[data-name="speed"] input').value;
     var selected_los_speed = document.querySelector('.cycler[data-name="los-speed"] input').value;
@@ -592,7 +620,7 @@ function filter(ignore_link=false){
 
     // Filter other evidences
     for (var i = 0; i < Object.keys(all_evidence).length; i++){
-        var checkbox = document.getElementById(Object.keys(all_evidence)[i]);
+        var checkbox = document.getElementById(Object.keys(all_evidence)[i]+evi_type);
         $(checkbox).removeClass("block")
         $(checkbox).find("#checkbox").removeClass(["block","disabled","faded"])
         $(checkbox).find(".label").removeClass("disabled-text")
@@ -629,6 +657,7 @@ function filter(ignore_link=false){
             evidence.push(evi_objects[j].getAttribute("name"))
         }
         var temp_vals = [...ghosts[i].querySelector(".ghost_hunt_info").innerText.replace('\n','').matchAll(/\d+(?:\.\d+)?(?:\s*\n?\s*m\/s|\s*\n?\s*s)/g)].map(m => m[0].replace(/\s+/g, ''));
+        var forced_evidence = ghosts[i].getElementsByClassName("ghost_forced_evidence")[0].textContent;
         var speed = parseFloat(temp_vals[0])
         var los_speed = parseFloat(temp_vals[1])
         var holy_water = parseFloat(temp_vals[2])
@@ -641,7 +670,7 @@ function filter(ignore_link=false){
 
         // Check for evidences
         // Standard
-        if (["3","3N","3I","3E","3M"].includes(num_evidences)){
+        if (difficulties[num_evidences].evi == 3){
 
             if (evi_array.length > 0){
                 evi_array.forEach(function (item,index){
@@ -670,13 +699,10 @@ function filter(ignore_link=false){
         }
 
         // Nightmare Mode
-        else if (num_evidences == "2"){
+        else if (difficulties[num_evidences].evi == 2){
 
-            if (evi_array.length == 3 && name != "The Mimic"){
-                keep = false
-            }
-            else if (evi_array.length > 0){
-                if (evi_array.length > (evidence.length > 3 ? 2 : 1) && evidence.filter(x => !evi_array.includes(x)).includes(nm_evidence)){
+            if (evi_array.length > 0){
+                if (evi_array.length > (evidence.length > 3 ? 2 : 1) && evidence.filter(x => !evi_array.includes(x)).includes(forced_evidence)){
                     keep = false
                 }
 
@@ -688,6 +714,9 @@ function filter(ignore_link=false){
 
             }
 
+            if (forced_evidence != "" && not_evi_array.includes(forced_evidence)){
+                keep = false
+            }
             if (not_evi_array.length > 1){
                 if (evidence.filter(x => !not_evi_array.includes(x)).length <= (evidence.length > 3 ? 2 : 1)){
                     keep = false
@@ -703,21 +732,25 @@ function filter(ignore_link=false){
                     else if(not_evi_array.includes(item)){
                         $(evi_objects[index]).addClass("ghost_evidence_not")
                     }
-                    else if(evi_array.length == evidence.length - 1){
+                    else if(
+                        (evi_array.length == evidence.length - 1) || 
+                        (evi_array.length == evidence.length - 2 && forced_evidence && item != forced_evidence && !evi_array.includes(forced_evidence))
+                    ){
                         $(evi_objects[index]).addClass("ghost_evidence_not")
                     }
+                }
+
+                if(forced_evidence && item == forced_evidence){
+                    $(evi_objects[index]).addClass("nightmare_highlight")
                 }
             })
         }
 
         // Insanity
-        else if (num_evidences == "1"){
+        else if (difficulties[num_evidences].evi == 1){
 
-            if (evi_array.length == 2 && name != "The Mimic"){
-                keep = false
-            }
-            else if (evi_array.length > 0){
-                if (evi_array.length > (evidence.length > 3 ? 1 : 0) && evidence.filter(x => !evi_array.includes(x)).includes(nm_evidence)){
+            if (evi_array.length > 0){
+                if (evi_array.length > (evidence.length > 3 ? 1 : 0) && evidence.filter(x => !evi_array.includes(x)).includes(forced_evidence)){
                     keep = false
                 }
 
@@ -729,6 +762,10 @@ function filter(ignore_link=false){
 
             }
 
+            if (forced_evidence != "" && not_evi_array.includes(forced_evidence)){
+                keep = false
+            }
+
 
             // Manage evidence classes
             evidence.forEach(function(item, index){
@@ -736,32 +773,48 @@ function filter(ignore_link=false){
                     if(evi_array.includes(item)){
                         $(evi_objects[index]).addClass("ghost_evidence_found")
                     }
-                    else if(not_evi_array.includes(item)){
+                    else if(
+                        (evi_array.length == evidence.length - 2) || 
+                        (evi_array.length == evidence.length - 3 && forced_evidence && item != forced_evidence && !evi_array.includes(forced_evidence))
+                    ){
                         $(evi_objects[index]).addClass("ghost_evidence_not")
                     }
                     else if(evi_array.length == evidence.length - 2){
                         $(evi_objects[index]).addClass("ghost_evidence_not")
                     }
                 }
+                if(forced_evidence && item == forced_evidence){
+                    $(evi_objects[index]).addClass("nightmare_highlight")
+                }
             })
         }
 
         // Apocalypse
-        else if (num_evidences == "0"){
-
-            if (evi_array.length > 0 && name != "The Mimic"){
-                keep = false
-            }
-
-            if (not_evi_array.length > 0 && name == "The Mimic"){
-                keep = false
-            }
+        else if (difficulties[num_evidences].evi == 0){
 
             // Manage evidence classes
             if(document.getElementById("adaptive_evidence").checked){
                 evidence.forEach(function(item, index){
                     $(evi_objects[index]).addClass("ghost_evidence_not")
                 })
+            }
+        }
+
+        // False evidence filtering
+        if (may_evi_array.length > 1){
+            if (may_evi_array.length <= evidence.length){
+                if(may_evi_array.filter(element => evidence.includes(element)).length < may_evi_array.length - 1){
+                    keep = false
+                }
+            }
+            else{
+                if (!evidence.every(item => may_evi_array.includes(item))){
+                    keep = false
+                }
+            }
+
+            if (forced_evidence && !evi_array.includes(forced_evidence) && !may_evi_array.includes(forced_evidence)){
+                keep = false
             }
         }
 
@@ -868,11 +921,22 @@ function filter(ignore_link=false){
         }
     }
 
-    if (["3","3N","3I","3E","3M"].includes(num_evidences)){
+    Object.keys(all_evidence).forEach(function(item){
+        if (maxed && !evi_array.includes(item) && !may_evi_array.includes(item) && !not_evi_array.includes(item)){
+            var checkbox = document.getElementById(item+evi_type);
+            $(checkbox).addClass("block")
+            $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
+            $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
+            $(checkbox).find(".label").addClass("disabled-text")
+            $(checkbox).find(".label").removeClass("strike")
+        }
+    })
+
+    if (difficulties[num_evidences].evi == 3){
         if (evi_array.length >= 0){
             Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                    var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
                     $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
@@ -883,64 +947,12 @@ function filter(ignore_link=false){
         }
     }
 
-    else if (num_evidences == "2"){
-        var keep_evi = evi_array
-        if (keep_evi.length == 3){
-            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
-                    $(checkbox).addClass("block")
-                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-                    $(checkbox).find(".label").addClass("disabled-text")
-                    $(checkbox).find(".label").removeClass("strike")
-                }
-            })
-        }
-        else if (keep_evi.length == 2){
-            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
-                    $(checkbox).addClass("block")
-                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-                    $(checkbox).find(".label").addClass("disabled-text")
-                    $(checkbox).find(".label").removeClass("strike")
-                }
-            })
-        }
-        else if (keep_evi.length > 0){
-            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
-                    $(checkbox).addClass("block")
-                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-                    $(checkbox).find(".label").addClass("disabled-text")
-                    $(checkbox).find(".label").removeClass("strike")
-                }
-            })
-        }
-    }
-
-    else if (num_evidences == "1"){
+    else if (difficulties[num_evidences].evi == 2){
         var keep_evi = evi_array
         if (keep_evi.length == 2){
             Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
-                    $(checkbox).addClass("block")
-                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-                    $(checkbox).find(".label").addClass("disabled-text")
-                    $(checkbox).find(".label").removeClass("strike")
-                }
-            })
-        }
-        else if (keep_evi.length == 1){
-            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                    var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
                     $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
@@ -951,8 +963,8 @@ function filter(ignore_link=false){
         }
         else if (keep_evi.length > 0){
             Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item)){
-                    var checkbox = document.getElementById(item);
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item)){
+                    var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
                     $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
@@ -963,9 +975,37 @@ function filter(ignore_link=false){
         }
     }
 
-    else if (num_evidences == "0"){
+    else if (difficulties[num_evidences].evi == 1){
+        var keep_evi = evi_array
+        if (keep_evi.length == 1 && maxed){
+            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                    var checkbox = document.getElementById(item+evi_type);
+                    $(checkbox).addClass("block")
+                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
+                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
+                    $(checkbox).find(".label").addClass("disabled-text")
+                    $(checkbox).find(".label").removeClass("strike")
+                }
+            })
+        }
+        else if (keep_evi.length > 0 && maxed){
+            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                    var checkbox = document.getElementById(item+evi_type);
+                    $(checkbox).addClass("block")
+                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
+                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
+                    $(checkbox).find(".label").addClass("disabled-text")
+                    $(checkbox).find(".label").removeClass("strike")
+                }
+            })
+        }
+    }
+
+    else if (difficulties[num_evidences].evi == 0){
         Object.keys(all_evidence).filter(evi => evi != 'Ghost Orbs').forEach(function(item){
-            var checkbox = document.getElementById(item);
+            var checkbox = document.getElementById(item+evi_type);
             $(checkbox).addClass("block")
             $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
             $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
@@ -994,9 +1034,10 @@ function filter(ignore_link=false){
             !not_fade_evidence.has(item) &&
             keep_evidence.has(item) &&
             !evi_array.includes(item) &&
-            !not_evi_array.includes(item)
+            !not_evi_array.includes(item) &&
+            !may_evi_array.includes(item)
         ){
-            var checkbox = document.getElementById(item);
+            var checkbox = document.getElementById(item+evi_type);
             $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
             $(checkbox).find("#checkbox").addClass(["neutral","faded"])
             $(checkbox).find(".label").addClass("disabled-text")
@@ -1491,13 +1532,11 @@ function flashMode(custom_message=null){
     }
     else{
         var cur_evidence = document.getElementById("num_evidence").value
-        var mode_text = {
-            "3N":lang_data['{{novice}}'],
-            "3I":lang_data['{{intermediate}}'],
-            "3E":lang_data['{{expert}}'],
-            "3M":lang_data['{{master}}']
-        }[cur_evidence]
-        document.getElementById("game_mode").innerHTML = `${mode_text}<span>(${parseInt(cur_evidence)} ${lang_data['{{evidence}}']})</span>`
+        let flash_html = `${lang_data[difficulties[cur_evidence].name]}<span>(${parseInt(difficulties[cur_evidence].evi)} ${lang_data['{{evidence}}']})</span>`
+        if (difficulties[cur_evidence].fake){
+            flash_html += ` <span style="color:#d69a9a;">(${parseInt(difficulties[cur_evidence].fake)} ${lang_data['{{false_evidence}}']})</span>`
+        }
+        document.getElementById("game_mode").innerHTML = flash_html
     }
     $("#game_mode").fadeIn(500,function () {
         $("#game_mode").delay(500).fadeOut(500);
@@ -1559,11 +1598,7 @@ function loadSettings(){
     document.getElementById("card_format").value = load_default('layout',0)
     document.getElementById("hide_sanity_speed").checked = load_default('hide_sanity_speed',0) == 1
     document.getElementById("offset_value").innerText = ` ${load_default('offset',0.0)}% `
-
-    if(Array.from(document.getElementById("num_evidence").options).map(option => option.value).includes(load_default('num_evidences','3')))
-        document.getElementById("num_evidence").value = load_default('num_evidences','3')
-    else
-        document.getElementById("num_evidence").value = '-1'
+    document.getElementById("num_evidence").value = legacy_correct[load_default('num_evidences','3N')]??load_default('num_evidences','3N')
 
     document.getElementById("bpm_type").checked = load_default('bpm_type',0) == 1
     if (load_default('domo_side',0) == 1){
@@ -1634,6 +1669,7 @@ function loadSettings(){
     toggleVoicePrefix()
     adjustOffset(0)
     setTempo()
+    checkDifficulty(document.getElementById("num_evidence"))
     updateMapDifficulty(user_settings['num_evidences'])
     // showCustom()
     setTimeout(() => {
@@ -1681,8 +1717,22 @@ function resetSettings(){
     setCookie("tos_settings",JSON.stringify(user_settings),30)
 }
 
-function checkDifficulty(){
-    
+function checkDifficulty(elem){
+    if (elem.value == "CL"){
+        $("#evidence").hide()
+        $("#evidence-fake").hide()
+        $("#evidence-cleanse").show()
+    }
+    else if (difficulties[elem.value].fake > 0){
+        $("#evidence-cleanse").hide()
+        $("#evidence").hide()
+        $("#evidence-fake").show()
+    }
+    else{
+        $("#evidence-cleanse").hide()
+        $("#evidence-fake").hide()
+        $("#evidence").show()
+    }
 }
 
 function changeMap(elem,map,ignore_link=false){

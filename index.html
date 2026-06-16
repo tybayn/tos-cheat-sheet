@@ -44,7 +44,7 @@
             return controller.signal;
         };
     </script>
-    <script src="scripts-v1/ghost_template-v3.js"></script>
+    <script src="scripts-v1/ghost_template-v4.js"></script>
     <link rel="stylesheet" href="styles-v1/style-v3.css"/>
     <link rel="stylesheet" href="styles-v1/style-mobile-v3.css"/>
     <link rel="stylesheet" href="themes-v1/themes-v1.css"/>
@@ -853,12 +853,7 @@
                 
                 <div class="difficulty_holder">
                     <img id="weekly_icon" src="imgs/weekly.png" onclick="showWeekly(event)" style="display: none;">
-                    <select name="num_evidence" id="num_evidence" class="num_evidence" onchange="updateMapDifficulty(this.value);bpm_calc(true);saveSettings();filter();flashMode();">
-                        <option value="3N">{{novice}}</option>
-                        <option value="3I">{{intermediate}}</option>
-                        <option value="3E">{{expert}}</option>
-                        <option value="3M">{{master}}</option>
-
+                    <select name="num_evidence" id="num_evidence" class="num_evidence" onchange="checkDifficulty(this);updateMapDifficulty(this.value);bpm_calc(true);saveSettings();filter();flashMode();">
                     </select>
                 </div>
 
@@ -1065,12 +1060,12 @@
     <script src="themes-v1/themes-v1.js"></script>
     <script src="scripts-v1/audio_controller-v1.js"></script>
     <script src="scripts-v1/metronome-v2.js"></script>
-    <script src="scripts-v1/timer-v1.js"></script>
+    <script src="scripts-v1/timer-v2.js"></script>
     <script src="login-v1/login-v1.js"></script>
     <script src="wiki-v1/wiki-v1.js"></script>
-    <script src="scripts-v1/filter-v4.js"></script>
-    <script src="scripts-v1/wslink-v3.js"></script>
-    <script src="scripts-v1/zn-v3.js"></script>
+    <script src="scripts-v1/filter-v5.js"></script>
+    <script src="scripts-v1/wslink-v4.js"></script>
+    <script src="scripts-v1/zn-v4.js"></script>
     <script src="scripts-v1/search-v1.js"></script>
     <script src="scripts-v1/voice_en-v1.js"></script>
     <script src="scripts-v1/voice_recognition-v1.js"></script>
