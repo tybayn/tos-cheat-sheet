@@ -276,155 +276,6 @@ function toggleForestMinion(value, reset=false, force_off = false, ignore_link=f
     if(!ignore_link){filter(ignore_link)}
 }
 
-let particleCanvas, particleCtx, bloodMoonParticles = [];
-let bloodMoonRunning = false;
-let bloodMoonAnimFrame;
-const PARTICLE_COUNT = 60;
-
-function toggleBloodMoon(force_on = false, force_off = false, ignore_link = false) {
-    const icon1 = $('#blood-moon-icon');
-    const icon2 = $('#blood-moon-icon-2');
-    const isActive = icon1.hasClass('blood-moon-active');
-
-    if (force_off || (isActive && !force_on)) {
-        icon1.removeClass('blood-moon-active').attr("src", "imgs/moon-w.png");
-        icon2.removeClass('blood-moon-active').attr("src", "imgs/moon-w.png");
-        $("#blood-moon-effect-top").removeClass("blood-moon-effect-top");
-        $("#blood-moon-effect-top").removeClass("blood-moon-effect-top-anim");
-        $("#blood-moon-effect-bottom").removeClass("blood-moon-effect-bottom");
-        $("#blood-moon-effect-bottom").removeClass("blood-moon-effect-bottom-anim");
-        stopBloodMoonParticles();
-        blood_moon = 0;
-    } else {
-        icon1.addClass('blood-moon-active').attr("src", "imgs/moon-r.png");
-        icon2.addClass('blood-moon-active').attr("src", "imgs/moon-r.png");
-        $("#blood-moon-effect-top").addClass("blood-moon-effect-top");
-        $("#blood-moon-effect-bottom").addClass("blood-moon-effect-bottom");
-        if (!document.getElementById("disable_particles").checked){
-            $("#blood-moon-effect-top").addClass("blood-moon-effect-top-anim");
-            $("#blood-moon-effect-bottom").addClass("blood-moon-effect-bottom-anim");
-        }
-        startBloodMoonParticles();
-        blood_moon = 1;
-    }
-
-    send_modifier_link()
-
-    if (!ignore_link) filter(ignore_link);
-}
-
-function startBloodMoonParticles() {
-    if (!$('#blood-moon-icon').hasClass('blood-moon-active'))
-        return;
-
-    stopBloodMoonParticles();
-
-    const disableParticles = document.getElementById("disable_particles")?.checked;
-    const top = $("#blood-moon-effect-top");
-    const bottom = $("#blood-moon-effect-bottom");
-
-    // toggle pulse
-    if (disableParticles) {
-        top.removeClass("blood-moon-effect-top-anim");
-        bottom.removeClass("blood-moon-effect-bottom-anim");
-        return;
-    } else {
-        if (!top.hasClass("blood-moon-effect-top-anim")) {
-            top.addClass("blood-moon-effect-top-anim");
-            bottom.addClass("blood-moon-effect-bottom-anim");
-        }
-    }
-
-    particleCanvas = document.getElementById('particle-canvas');
-    particleCtx = particleCanvas.getContext('2d');
-
-    function resizeCanvas() {
-        particleCanvas.width = window.innerWidth;
-        particleCanvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    const h = particleCanvas.height;
-
-    bloodMoonParticles = Array.from({ length: PARTICLE_COUNT }, () => {
-        const up = Math.random() > 0.5; // 50% go up, 50% go down
-        const yStart = up ? h : 0; // start bottom or top
-        return {
-            x: Math.random() * particleCanvas.width,
-            y: yStart,
-            baseY: yStart,
-            vy: (Math.random() * 0.3 + 0.15) * (up ? -1 : 1),
-            size: Math.random() * 2 + 2,
-            color: Math.random() < 0.5 ? 'rgb(160, 0, 0)' : 'rgb(40, 40, 40)',
-            life: Math.random() * 2 + 2, // seconds
-            age: 0,
-            up
-        };
-    });
-
-    bloodMoonRunning = true;
-    animateBloodMoonParticles(performance.now());
-}
-
-function animateBloodMoonParticles(lastTime) {
-    if (!bloodMoonRunning) return;
-
-    const now = performance.now();
-    const delta = (now - lastTime) / 1000;
-    const ctx = particleCtx;
-    const w = particleCanvas.width;
-    const h = particleCanvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-
-    const travel = h * 0.3;
-
-    for (const p of bloodMoonParticles) {
-        
-        p.age += delta;
-        const progress = p.age / p.life;
-        const alpha = 1 - progress; // fade out
-
-        // move within travel distance
-        p.y = p.baseY + travel * progress * (p.up ? -1 : 1);
-
-        ctx.beginPath();
-        ctx.globalAlpha = alpha;
-        ctx.fillStyle = p.color;
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (progress >= 1) {
-            // reset particle
-            p.x = Math.random() * w;
-            p.baseY = p.up ? h : 0;
-            p.y = p.baseY;
-            p.life = Math.random() * 2 + 4;
-            p.age = Math.random() * p.life;
-            p.size = Math.random() * 2 + 2;
-            p.color = Math.random() < 0.5 ? 'rgb(160, 0, 0)' : 'rgb(40, 40, 40)';
-        }
-    }
-
-    ctx.globalAlpha = 1;
-    bloodMoonAnimFrame = requestAnimationFrame(() => animateBloodMoonParticles(now));
-}
-
-function stopBloodMoonParticles() {
-    bloodMoonRunning = false;
-    if (bloodMoonAnimFrame) cancelAnimationFrame(bloodMoonAnimFrame);
-
-    const top = $("#blood-moon-effect-top");
-    const bottom = $("#blood-moon-effect-bottom");
-    top.removeClass("blood-moon-effect-top-anim");
-    bottom.removeClass("blood-moon-effect-bottom-anim");
-
-    if (particleCtx) {
-        particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-    }
-}
-
 function select(elem,ignore_link=false,internal=false){
     if ($(elem).hasClass("faded")){
         fade(elem,ignore_link)
@@ -590,7 +441,7 @@ function filter(ignore_link=false){
     num_evidences = num_evidences ? num_evidences : user_settings.num_evidences
 
     if (num_evidences == "-1" || num_evidences.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
-        num_evidences = document.getElementById("cust_num_evidence").value
+        num_evidences = parseInt(document.getElementById("cust_num_evidence").value)
         num_evi = num_evidences
         num_fake = parseInt(document.getElementById("cust_fake_evidence").value)
         evi_type = parseInt(document.getElementById("cust_fake_evidence").value) > 0 ? '-fake' : '';
@@ -601,14 +452,13 @@ function filter(ignore_link=false){
         evi_type = difficulties[num_evidences].fake > 0 ? '-fake' : '';
     }
     
+    
     var good_checkboxes = document.querySelectorAll(`[name="evidence${evi_type}"] .good`);
     var bad_checkboxes = document.querySelectorAll(`[name="evidence${evi_type}"] .bad`);
     var maybe_checkboxes = document.querySelectorAll(`[name="evidence${evi_type}"] .maybe`);
     var speed_checkboxes = document.querySelectorAll(`[name="speed"] .good`);
     var los_speed_checkboxes = document.querySelectorAll(`[name="losspeed"] .good`);
     var holy_water_checkboxes = document.querySelectorAll(`[name="holywater"] .good`);
-    
-    
 
     for (var i = 0; i < good_checkboxes.length; i++) {
         evi_array.push(good_checkboxes[i].parentElement.value);
@@ -625,7 +475,7 @@ function filter(ignore_link=false){
         state["evidence"][maybe_checkboxes[i].parentElement.value] = 2;
     }
 
-    var maxed = may_evi_array.length + evi_array.length == num_evi + num_fake
+    var maxed = (may_evi_array.length + evi_array.length) == (num_evi + num_fake)
 
     var selected_speed = document.querySelector('.cycler[data-name="speed"] input').value;
     var selected_los_speed = document.querySelector('.cycler[data-name="los-speed"] input').value;
@@ -958,25 +808,23 @@ function filter(ignore_link=false){
     })
 
     if (num_evi == 3){
-        if (evi_array.length >= 0){
-            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
-                    var checkbox = document.getElementById(item+evi_type);
-                    $(checkbox).addClass("block")
-                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
-                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
-                    $(checkbox).find(".label").addClass("disabled-text")
-                    $(checkbox).find(".label").removeClass("strike")
-                }
-            })
-        }
+        Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
+            if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
+                var checkbox = document.getElementById(item+evi_type);
+                $(checkbox).addClass("block")
+                $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
+                $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
+                $(checkbox).find(".label").addClass("disabled-text")
+                $(checkbox).find(".label").removeClass("strike")
+            }
+        })
     }
 
     else if (num_evi == 2){
         var keep_evi = evi_array
         if (keep_evi.length == 2){
             Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
@@ -988,7 +836,7 @@ function filter(ignore_link=false){
         }
         else if (keep_evi.length > 0){
             Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item) && !may_evi_array.includes(item)){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
@@ -1004,7 +852,7 @@ function filter(ignore_link=false){
         var keep_evi = evi_array
         if (keep_evi.length == 1 && maxed){
             Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) &&  (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
@@ -1016,7 +864,7 @@ function filter(ignore_link=false){
         }
         else if (keep_evi.length > 0 && maxed){
             Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
-                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && maxed){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item) &&  (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
                     $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
