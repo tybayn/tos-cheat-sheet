@@ -191,7 +191,7 @@ function loadAllAndConnect(){
                     `
                     evidence_list_fake.innerHTML += `
                     <div class="evidence-row">
-                        <button id="${key}-fake" class="tricheck white" name="evidence-fake" onclick="quadstate(this)" value="${key}">
+                        <button id="${key}-fake" class="tricheck white" name="evidence-fake" onclick="${key == 'Freezing'? 'tristate(this)' : 'quadstate(this)'}" value="${key}">
                             <div id="checkbox" class="neutral"><span class="icon"></span></div>
                             <div class="label">${key}</div>
                         </button>

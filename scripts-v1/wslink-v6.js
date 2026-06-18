@@ -341,7 +341,12 @@ function link_room(){
                 if (action == "EVIDENCE"){
                     if (difficulties[user_settings['num_evidences']].fake > 0 )
                         if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
-                            quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                            if(incoming_state['evidence'] == "Freezing"){
+                                tristate(document.getElementById(incoming_state['evidence']+"-fake"))
+                            }
+                            else{
+                                quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                            }
                         }
                     else
                         if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
@@ -498,7 +503,10 @@ function link_room(){
                 for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
                     if(num_fake > 0)
                         while (!$(document.getElementById(key+"-fake").querySelector("#checkbox")).hasClass(["bad","neutral","good","maybe"][value + 1])){
-                            quadstate(document.getElementById(key+"-fake"),true,true);
+                            if(key == "Freezing")
+                                tristate(document.getElementById(key+"-fake"),true);
+                            else
+                                quadstate(document.getElementById(key+"-fake"),true,true);
                         }
                     else
                         while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
@@ -821,7 +829,12 @@ function link_link(reconnect = false){
             else if (action == "EVIDENCE"){
                 if (difficulties[user_settings['num_evidences']].fake > 0 )
                     if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
-                        quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                        if(incoming_state['evidence'] == "Freezing"){
+                            tristate(document.getElementById(incoming_state['evidence']+"-fake"))
+                        }
+                        else{
+                            quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                        }
                     }
                 else
                     if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
