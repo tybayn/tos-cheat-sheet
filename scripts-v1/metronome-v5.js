@@ -11,12 +11,12 @@ var offset = 0
 var step_duration = 5 * 1000
 
 let speedToBpm = {
-    "0": (x) => (100 * x - 150) * 0.5,
-    "1": (x) => (100 * x - 150) * 1.0,
-    "2": (x) => (100 * x - 150) * 1.5,
-    "3": (x) => (100 * x - 150) * 2.0,
-    "4": (x) => (100 * x - 150) * 2.5,
-    "5": (x) => (100 * x - 150) * 3.0
+    "0": (x) => 100 * x - 185,
+    "1": (x) => 100 * x - 150,
+    "2": (x) => 100 * x - 110,
+    "3": (x) => 100 * x - 110,
+    "4": (x) => 100 * x - 110,
+    "5": (x) => 100 * x - 110
 }
 
 let speedToRand = {
@@ -29,12 +29,12 @@ let speedToRand = {
 }
 
 let bpmToSpeed = {
-    "0": (x) => (x + 150) / 100 / 0.5,
-    "1": (x) => (x + 150) / 100 / 1.0,
-    "2": (x) => (x + 150) / 100 / 1.5,
-    "3": (x) => (x + 150) / 100 / 2.0,
-    "4": (x) => (x + 150) / 100 / 2.5,
-    "5": (x) => (x + 150) / 100 / 3.0
+    "0": (x) => (x + 185) / 100,
+    "1": (x) => (x + 150) / 100,
+    "2": (x) => (x + 110) / 100,
+    "3": (x) => (x + 110) / 100,
+    "4": (x) => (x + 110) / 100,
+    "5": (x) => (x + 110) / 100
 }
 
 var last_id = "";
@@ -139,7 +139,7 @@ function bpm_tap(ts=-1){
 function draw_graph(clear = true){
     var graph = $('#bpm_hist')
     var c = graph[0].getContext('2d');
-    var hlen = map_hunt_lengths[map_difficulty][map_size]
+    var hlen = map_hunt_lengths[map_difficulty]
 
     try{
         c.reset()
@@ -208,7 +208,7 @@ function draw_graph(clear = true){
 function graph_bpm(){
     var graph = $('#bpm_hist')
     var c = graph[0].getContext('2d');
-    var hlen = map_hunt_lengths[map_difficulty][map_size]
+    var hlen = map_hunt_lengths[map_difficulty]
 
     c.lineWidth = 1;
     c.strokeStyle = "#f00"
@@ -241,15 +241,6 @@ function bpm_clear() {
     var ghosts = document.getElementsByClassName("ghost_card")
     for (var i = 0; i < ghosts.length; i++){
         ghosts[i].style.boxShadow = 'none'
-    }
-    $("#guide_tab_footstep").hide()
-    $("#hunts_tab_footstep").hide()
-    $("#hunts_tab_indent_footstep").hide()
-    for (var g = 0 ;g < additional_ghost_data.length; g++){
-        var speed_tab = document.getElementById(`${additional_ghost_data[g]}_speed_breakdown`)
-        for (var i = 1, row; row = speed_tab.rows[i]; i++){
-            $(row).removeClass("row_select")
-        }
     }
     send_bpm_link("-","-","100%")
     send_ghosts_link()
@@ -383,7 +374,7 @@ function mark_ghosts(ms){
                 }
             }
             else{
-                if ((speed - 0.125) <= ms && ms <= (speed + 0.125)){
+                if ((speed - 0.09) <= ms && ms <= (speed + 0.09)){
                     ghosts[i].style.boxShadow = '0px 0px 10px 2px #dbd994'
                     bpm_list.push(ghosts[i].id)
                 }

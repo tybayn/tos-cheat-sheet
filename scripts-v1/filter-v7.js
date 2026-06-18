@@ -1643,7 +1643,7 @@ function loadSettings(){
     document.getElementById("card_format").value = load_default('layout',0)
     document.getElementById("hide_sanity_speed").checked = load_default('hide_sanity_speed',0) == 1
     document.getElementById("offset_value").innerText = ` ${load_default('offset',0.0)}% `
-    document.getElementById("ghost_modifier_speed").value = load_default('ghost_modifier',2)
+    document.getElementById("ghost_modifier_speed").value = load_default('ghost_modifier',1)
 
     if(Array.from(document.getElementById("num_evidence").options).map(option => option.value).includes(load_default('num_evidences','3N')))
         document.getElementById("num_evidence").value = load_default('num_evidences','3N')
@@ -1747,7 +1747,7 @@ function resetSettings(){
     document.getElementById("card_format").value = load_default('layout',0)
     document.getElementById("hide_sanity_speed").checked = load_default('hide_sanity_speed',0) == 1
     document.getElementById("offset_value").innerText = ` ${load_default('offset',0.0)}% `
-    document.getElementById("ghost_modifier_speed").value = load_default('ghost_modifier',2)
+    document.getElementById("ghost_modifier_speed").value = load_default('ghost_modifier',1)
     document.getElementById("num_evidence").value = load_default('num_evidences','3N')
     document.getElementById("cust_num_evidence").value = load_default('cust_num_evidences','3')
     document.getElementById("cust_fake_evidence").value = load_default('cust_fake_evidences','0')
@@ -1965,8 +1965,8 @@ function playSound(resource){
 }
 
 function setGhostSpeedFromDifficulty(dif){
-    if(!dif.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
-        speed = {"-1":1,"3N":1,"3I":1,"2E":1,"1M":1,"2F":2,"3S":2,"1MA":5}[dif]
+    if(!dif.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g) && !["-1","CL"].includes(dif)){
+        speed = {"3N":1,"3I":1,"2E":1,"1M":1,"2F":2,"3S":2,"1MA":5}[dif]
         document.getElementById("ghost_modifier_speed").value = speed
     }
 }
