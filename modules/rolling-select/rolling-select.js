@@ -58,16 +58,24 @@ function setCyclerValue(name, value) {
     if (index === -1) return;
 
     cycler.dataset.current = index;
-    cycler.querySelector(".cycler-value").innerHTML = options[index].includes('{{') ? lang_data[options[index].replace('%','')] : options[index];
+    if (lang_data && lang_data.hasOwnProperty(options[index].replace('%',''))){
+        cycler.querySelector(".cycler-value").innerHTML = options[index].includes('{{') ? lang_data[options[index].replace('%','')] : options[index];
+    }
+    else{
+        cycler.querySelector(".cycler-value").innerHTML = options[index].includes('{{') ? options[index].replace('%','') : options[index];
+    }
     cycler.querySelector("input").value = value;
 }
 
-function loadCyclerState(){
-    setCyclerValue("speed",state["speed"])
-    setCyclerValue("los-speed",state["los_speed"])
-    setCyclerValue("holy-water",state["holy_water"])
-    setCyclerValue("candle-interaction",state["candle_interaction"])
-    setCyclerValue("light-interaction",state["light_interaction"])
-    setCyclerValue("radio-interaction",state["radio_interaction"])
-    setCyclerValue("rem-interaction",state["rem_interaction"])
+function loadCyclerState(incoming_state = null){
+    if (incoming_state === null){
+        incoming_state = state
+    }
+    setCyclerValue("speed",incoming_state["speed"])
+    setCyclerValue("los-speed",incoming_state["los_speed"])
+    setCyclerValue("holy-water",incoming_state["holy_water"])
+    setCyclerValue("candle-interaction",incoming_state["candle_interaction"])
+    setCyclerValue("light-interaction",incoming_state["light_interaction"])
+    setCyclerValue("radio-interaction",incoming_state["radio_interaction"])
+    setCyclerValue("rem-interaction",incoming_state["rem_interaction"])
 }

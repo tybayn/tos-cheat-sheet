@@ -248,7 +248,7 @@ function loadAllAndConnect(){
                 for (const [key, value] of Object.entries(read_state["evidence"])){ 
                     let num_fake = 0
                     if (us['num_evidences'] == '-1' || us['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
-                        num_fake = us['cust_fake_evidence'] ?? 0
+                        num_fake = parseInt(us['cust_fake_evidences'] ?? 0)
                     }
                     else{
                         num_fake = difficulties[legacy_correct[us['num_evidences']??'3N']??us['num_evidences']].fake
@@ -299,13 +299,8 @@ function loadAllAndConnect(){
                     }
                 }
 
-                state["speed"] = read_state["speed"]
-                state["los_speed"] = read_state["los_speed"]
-                state["holy_water"] = read_state["holy_water"]
-                state["candle_interaction"] = read_state["candle_interaction"]
-                state["rem_interaction"] = read_state["rem_interaction"]
-                state["light_interaction"] = read_state["light_interaction"]
-                state["radio_interaction"] = read_state["radio_interaction"]
+                loadCyclerState(read_state)
+
             })
             .then(() => {
                 let mquery = window.matchMedia("screen and (pointer: coarse) and (max-device-width: 600px)")
@@ -390,7 +385,6 @@ function loadAllAndConnect(){
                             Promise.all([getLink()])
                             .then(() => {
                                 buildSelectors()
-                                loadCyclerState()
                                 setLoading(100)
                                 loadSettings()
                                 filter(true)

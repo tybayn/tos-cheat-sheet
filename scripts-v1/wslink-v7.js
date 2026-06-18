@@ -339,7 +339,11 @@ function link_room(){
                     send_ml_state()
                 }
                 if (action == "EVIDENCE"){
-                    if (difficulties[user_settings['num_evidences']].fake > 0 )
+                    if (user_settings['num_evidences'] == '-1' || user_settings['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
+                        num_fake = parseInt(user_settings['cust_fake_evidences'])
+                    else
+                        num_fake = difficulties[user_settings['num_evidences']].fake
+                    if (num_fake > 0 )
                         if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
                             if(incoming_state['evidence'] == "Freezing"){
                                 tristate(document.getElementById(incoming_state['evidence']+"-fake"))
@@ -827,7 +831,13 @@ function link_link(reconnect = false){
             }
             
             else if (action == "EVIDENCE"){
-                if (difficulties[user_settings['num_evidences']].fake > 0 )
+                let num_fake = 0
+                if (user_settings['num_evidences'] == '-1' || user_settings['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
+                    num_fake = parseInt(user_settings['cust_fake_evidences'])
+                else
+                    num_fake = difficulties[user_settings['num_evidences']].fake
+
+                if (num_fake > 0){
                     if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
                         if(incoming_state['evidence'] == "Freezing"){
                             tristate(document.getElementById(incoming_state['evidence']+"-fake"))
@@ -836,10 +846,12 @@ function link_link(reconnect = false){
                             quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
                         }
                     }
-                else
+                }
+                else{
                     if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
                         tristate(document.getElementById(incoming_state['evidence']))
                     }
+                }
             }
 
             else if (action == "UNLINK"){
