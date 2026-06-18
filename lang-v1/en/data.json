@@ -96,6 +96,7 @@
     "{{possible_los}}": "Possible LOS Speed",
     "{{press_r}}": "Press 'R' to reset",
     "{{see_los_guide}}": "See \"Guides >> Hunts >> Speed & Line-of-sight (LOS)\" for info on how to read the graph",
+    "{{ghost_speed_warning}}": "Footstep speeds in-game are based on the animation of the ghost. Below 100% speed, the animation is slowed down but is the same for slow (2.42m/s) and fast (2.60m/s) ghosts. Above 100% speed, all speeds have the same animation speed for slow (2.42m/s) and fast (2.60m/s) ghosts. This means that outside of 100% speed, the BPM finder will not be able to differentiate speeds and speed may have to be determined by looking at the ghost's movement in-game.",
 
     "{{current_map}}": "Current Map",
     "{{click_to_change}}": "Click to change",

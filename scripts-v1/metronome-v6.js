@@ -11,12 +11,12 @@ var offset = 0
 var step_duration = 5 * 1000
 
 let speedToBpm = {
-    "0": (x) => 100 * x - 185,
+    "0": (x) => 100 * 2.6 - 185,
     "1": (x) => 100 * x - 150,
-    "2": (x) => 100 * x - 110,
-    "3": (x) => 100 * x - 110,
-    "4": (x) => 100 * x - 110,
-    "5": (x) => 100 * x - 110
+    "2": (x) => 100 * 2.6 - 110,
+    "3": (x) => 100 * 2.6 - 110,
+    "4": (x) => 100 * 2.6 - 110,
+    "5": (x) => 100 * 2.6 - 110
 }
 
 let speedToRand = {
@@ -29,12 +29,12 @@ let speedToRand = {
 }
 
 let bpmToSpeed = {
-    "0": (x) => (x + 185) / 100,
+    "0": (x) => (2.6 + 185) / 100,
     "1": (x) => (x + 150) / 100,
-    "2": (x) => (x + 110) / 100,
-    "3": (x) => (x + 110) / 100,
-    "4": (x) => (x + 110) / 100,
-    "5": (x) => (x + 110) / 100
+    "2": (x) => (2.6 + 110) / 100,
+    "3": (x) => (2.6 + 110) / 100,
+    "4": (x) => (2.6 + 110) / 100,
+    "5": (x) => (2.6 + 110) / 100
 }
 
 var last_id = "";
@@ -51,6 +51,11 @@ function mute(type){
 function setTempo(){
     var speed_idx = parseInt($("#ghost_modifier_speed").val())
     tempo = speedToBpm[speed_idx](speed) * (1+(offset/100))
+
+    if (speed_idx != 1)
+        $("#ghost_speed_warning").show()
+    else 
+        $("#ghost_speed_warning").hide()
 }
 
 function setVolume(){
