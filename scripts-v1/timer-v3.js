@@ -86,27 +86,24 @@ var hunt_worker;
 var count_direction = 0;
 var map_size = 0;
 var map_difficulty = 2;
-const map_hunt_lengths = [
-    [30*1.00,40*1.00,45*1.00,50*1.00], // Novice
-    [30*1.20,40*1.20,45*1.20,50*1.20], // Intermediate
-    [30*1.33,40*1.33,45*1.33,50*1.33], // Expert
-    [30*1.50,40*1.50,45*1.50,50*1.50]  // Master
-];
+const map_hunt_lengths = [0,25,45,75];
 
 function updateMapSize(size){
     map_size = {"S":0,"M":1,"L":2,"XL":3}[size]
-    document.getElementById("minute_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty][map_size]/60),2)
-    document.getElementById("second_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty][map_size]) % 60,2)
-    document.getElementsByClassName('hunt_size_label')[0].innerText = `${lang_data['{{map}}']}: ${["S","M","L","XL"][map_size]}, ${lang_data['{{hunt}}']}: ${["L","M","H","VH"][map_difficulty]}`
     document.getElementById("map_size_info").innerText = `${lang_data['{{map_size}}']}: ${lang_data[["{{small}}","{{medium}}","{{large}}","{{extra_large}}"][map_size]]}`
     draw_graph()
 }
 
 function updateMapDifficulty(difficulty){
-    map_difficulty = difficulties[difficulty].hunt
-    document.getElementById("minute_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty][map_size]/60),2)
-    document.getElementById("second_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty][map_size]) % 60,2)
-    document.getElementsByClassName('hunt_size_label')[0].innerText = `${lang_data['{{map}}']}: ${["S","M","L","XL"][map_size]}, ${lang_data['{{hunt}}']}: ${["S","M","L","VL"][map_difficulty]}`
+    if (difficulty == '-1' || difficulty.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
+        map_difficulty = parseInt(document.getElementById("cust_hunt_length").value)
+    }
+    else{
+        map_difficulty = (difficulties[difficulty]??difficulties['3N']).hunt
+    }
+    document.getElementById("minute_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty]/60),2)
+    document.getElementById("second_hunt").innerHTML = zeroPad(Math.round(map_hunt_lengths[map_difficulty]) % 60,2)
+    document.getElementsByClassName('hunt_size_label')[0].innerText = `${lang_data['{{hunt}}']}: ${["Off","Short","Medium","Long"][map_difficulty]}`
     draw_graph()
 }
 
@@ -338,7 +335,7 @@ function start_hunt_timer(){
         start_sound.play()
     }
 
-    var time = map_hunt_lengths[map_difficulty][map_size] +1;
+    var time = map_hunt_lengths[map_difficulty]+1;
     var prev_t = ""
     var snds_played = [0,0,0,0,0,0,0]
 
@@ -353,7 +350,7 @@ function start_hunt_timer(){
         var dt = t;
         var timeleft = Math.floor(t / 1000);
         if (count_direction == 1){
-            t = ((map_hunt_lengths[map_difficulty][map_size]+1)*1000) - t
+            t = ((map_hunt_lengths[map_difficulty]+1)*1000) - t
             dt = t
         }
         else{
@@ -450,7 +447,7 @@ function start_hunt_timer(){
             min_obj.innerHTML = min_val
             sec_obj.innerHTML = sec_val
 
-            var progressBarWidth = count_direction == 0 ? timeleft * progress_bar.width() / (time-1) : (map_hunt_lengths[map_difficulty][map_size] - timeleft) * progress_bar.width() / (time-1);
+            var progressBarWidth = count_direction == 0 ? timeleft * progress_bar.width() / (time-1) : (map_hunt_lengths[map_difficulty] - timeleft) * progress_bar.width() / (time-1);
             progress_bar_inner.style.width = progressBarWidth;
 
             prev_t = d_val

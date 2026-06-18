@@ -1217,8 +1217,14 @@
         font-size: 40px;
         padding: 7px 10px;
         font-family: 'ZNSecondary';
-        width: calc(50% - 10px) !important;
         border-radius: 20px;
+    }
+
+    #cust_num_evidence, #cust_fake_evidence{
+        width: calc(20% - 10px) !important;
+    }
+    #cust_hunt_length{
+        width: calc(60% - 10px) !important;
     }
 
     .cust_lobby_type{
@@ -1235,7 +1241,7 @@
 
     #game_mode{
         grid-column: 1;
-        grid-row: 3;
+        grid-row: 3 / 6;
         font-size: 60px;
         text-align: center;
         display: flex;

@@ -77,7 +77,8 @@ function scheduleStep(time) {
 }
 
 function playTick() {
-    secondsPerBeat = 60 / (tempo + speedToRand(speed,0.5));
+    var speed_idx = parseInt($("#ghost_modifier_speed").val())
+    secondsPerBeat = 60 / (tempo + speedToRand[speed_idx](speed,0.5));
     counterTimeValue = (secondsPerBeat / 1);
     counter += 1;
     futureStepTime += counterTimeValue;

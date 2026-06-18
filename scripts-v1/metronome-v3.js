@@ -10,9 +10,32 @@ var muteTimerCountdown = false
 var offset = 0
 var step_duration = 5 * 1000
 
-let speedToBpm = (x) => 100 * x - 150
-let speedToRand = (x,y) => parseFloat((Math.random() * (speedToBpm(x+y) - speedToBpm(x-y)) + speedToBpm(x-y)).toFixed(2)) - speedToBpm(x)
-let bpmToSpeed = (x) => (x + 150) / 100
+let speedToBpm = {
+    "0": (x) => (100 * x - 150) * 0.5,
+    "1": (x) => (100 * x - 150) * 1.0,
+    "2": (x) => (100 * x - 150) * 2.0,
+    "3": (x) => (100 * x - 150) * 2.5,
+    "4": (x) => (100 * x - 150) * 3.0,
+    "5": (x) => (100 * x - 150) * 3.5
+}
+
+let speedToRand = {
+    "0": (x,y) => parseFloat((Math.random() * (speedToBpm['0'](x+y) - speedToBpm['0'](x-y)) + speedToBpm['0'](x-y)).toFixed(2)) - speedToBpm['0'](x),
+    "1": (x,y) => parseFloat((Math.random() * (speedToBpm['1'](x+y) - speedToBpm['1'](x-y)) + speedToBpm['1'](x-y)).toFixed(2)) - speedToBpm['1'](x),
+    "2": (x,y) => parseFloat((Math.random() * (speedToBpm['2'](x+y) - speedToBpm['2'](x-y)) + speedToBpm['2'](x-y)).toFixed(2)) - speedToBpm['2'](x),
+    "3": (x,y) => parseFloat((Math.random() * (speedToBpm['3'](x+y) - speedToBpm['3'](x-y)) + speedToBpm['3'](x-y)).toFixed(2)) - speedToBpm['3'](x),
+    "4": (x,y) => parseFloat((Math.random() * (speedToBpm['4'](x+y) - speedToBpm['4'](x-y)) + speedToBpm['4'](x-y)).toFixed(2)) - speedToBpm['4'](x),
+    "5": (x,y) => parseFloat((Math.random() * (speedToBpm['5'](x+y) - speedToBpm['5'](x-y)) + speedToBpm['5'](x-y)).toFixed(2)) - speedToBpm['5'](x)
+}
+
+let bpmToSpeed = {
+    "0": (x) => (x + 150) / 100 / 0.5,
+    "1": (x) => (x + 150) / 100 / 1.0,
+    "2": (x) => (x + 150) / 100 / 2.0,
+    "3": (x) => (x + 150) / 100 / 2.5,
+    "4": (x) => (x + 150) / 100 / 3.0,
+    "5": (x) => (x + 150) / 100 / 3.5
+}
 
 var last_id = "";
 
@@ -26,7 +49,8 @@ function mute(type){
 }
 
 function setTempo(){
-    tempo = speedToBpm(speed) * (1+(offset/100))
+    var speed_idx = parseInt($("#ghost_modifier_speed").val())
+    tempo = speedToBpm[speed_idx](speed) * (1+(offset/100))
 }
 
 function setVolume(){
@@ -43,7 +67,8 @@ function adjustOffset(v){
 function toggleSound(set_tempo,id){
     adjustOffset(0)
     speed = set_tempo
-    tempo = speedToBpm(speed) * (1+(offset/100))
+    var speed_idx = parseInt($("#ghost_modifier_speed").val())
+    tempo = speedToBpm[speed_idx](speed) * (1+(offset/100))
     if(!isPlaying){
         step()
         timerStop = setTimeout(function(){
@@ -308,7 +333,8 @@ function bpm_calc(forced=false) {
 }
 
 function get_ms(bpm){
-    var t_ms= bpmToSpeed(bpm / (1+((offset)/100)))
+    var speed_idx = parseInt($("#ghost_modifier_speed").val())
+    var t_ms= bpmToSpeed[speed_idx](bpm / (1+((offset)/100)))
     var cur_ms = 0
     var cur_offset = 1000
     bpm_speeds.forEach(function(m){
@@ -322,7 +348,8 @@ function get_ms(bpm){
 }
 
 function get_ms_exact(bpm){
-    var cur_ms = bpmToSpeed(bpm / (1+((offset)/100)))
+    var speed_idx = parseInt($("#ghost_modifier_speed").val())
+    var cur_ms = bpmToSpeed[speed_idx](bpm / (1+((offset)/100)))
     return cur_ms < 0 ? 0.01 : cur_ms.toFixed(2)
 }
 

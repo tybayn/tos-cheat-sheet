@@ -194,7 +194,11 @@ function create_room(){
         'ghosts': state['ghosts'],
         "map": state['map'],
         'settings': {
-            "num_evidences":document.getElementById("num_evidence").value
+            "num_evidences":document.getElementById("num_evidence").value,
+            "dif_name":document.getElementById("num_evidence").options[document.getElementById("num_evidence").selectedIndex].text,
+            "cust_num_evidences":document.getElementById("cust_num_evidence").value,
+            "cust_fake_evidences":document.getElementById("cust_fake_evidence").value,
+            "cust_hunt_length":document.getElementById("cust_hunt_length").value
         }
     }
     fetch(`https://zero-network.net/zntlink/create-room/${znid}`,{method:"POST",Accept:"application/json",body:JSON.stringify(outgoing_state),signal: AbortSignal.timeout(6000)})
@@ -376,18 +380,61 @@ function link_room(){
                 } 
                 return
             }
-
-            else{
+            else if(!incoming_state.hasOwnProperty("action")){
                 if (
-                    document.getElementById("num_evidence").value != incoming_state['settings']['num_evidences']
+                    document.getElementById("num_evidence").value != incoming_state['settings']['num_evidences'] ||
+                    document.getElementById("cust_num_evidence").value != incoming_state['settings']['cust_num_evidences'] ||
+                    document.getElementById("cust_fake_evidence").value != incoming_state['settings']['cust_fake_evidences'] ||
+                    document.getElementById("cust_hunt_length").value != incoming_state['settings']['cust_hunt_length']
                 ){
                     if(incoming_state['settings']['num_evidences'] != "")
                         document.getElementById("num_evidence").value = incoming_state['settings']['num_evidences']
-                    checkDifficulty(document.getElementById("num_evidence"))
+                    if(incoming_state['settings']['cust_num_evidences'] != "")
+                        document.getElementById("cust_num_evidence").value = incoming_state['settings']['cust_num_evidences']
+                    if(incoming_state['settings']['cust_fake_evidences'] != "")
+                        document.getElementById("cust_fake_evidence").value = incoming_state['settings']['cust_fake_evidences']
+                    if(incoming_state['settings']['cust_hunt_length'] != "")
+                        document.getElementById("cust_hunt_length").value = incoming_state['settings']['cust_hunt_length']
+                    
+
+                    if(incoming_state['settings']['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
+                        if($("#num_evidence option[value='"+incoming_state['settings']['num_evidences']+"']").length === 0){
+                            let presets = document.getElementById("num_evidence")
+
+                            if($("#num_evidence option[value='sep4']").length === 0){
+                                var opt = document.createElement('option');
+                                opt.value = "sep4";
+                                opt.innerHTML = "----Shared----"
+                                opt.disabled = true
+                                presets.appendChild(opt)
+                            }
+
+                            var opt = document.createElement('option');
+                            opt.value = incoming_state['settings']['num_evidences'];
+                            opt.innerHTML = incoming_state['settings']['dif_name'];
+                            opt.selected = true
+                            opt.disabled = true
+                            presets.appendChild(opt);
+                        }
+
+                        $("#cust_num_evidence").attr("disabled","disabled")
+                        $("#cust_fake_evidence").attr("disabled","disabled")
+                        $("#cust_hunt_length").attr("disabled","disabled")
+                        $("#ghost_modifier_speed").attr("disabled","disabled")
+                        $("#ghost_modifier_speed").addClass("prevent")
+                        document.getElementById("num_evidence").value = incoming_state['settings']['num_evidences']
+                    }
+
+                    showCustom()
+                    checkDifficulty()
                     updateMapDifficulty(incoming_state['settings']['num_evidences'])
                     flashMode()
                 }
 
+                if(document.getElementById("ghost_modifier_speed").value != incoming_state['settings']['ghost_modifier']){
+                    document.getElementById("ghost_modifier_speed").value = incoming_state['settings']['ghost_modifier']
+                }
+                setGhostSpeedFromDifficulty(incoming_state['settings']['num_evidences'])
                 saveSettings()
 
                 for (const [key, value] of Object.entries(incoming_state["ghosts"])){ 
@@ -442,10 +489,16 @@ function link_room(){
                 }
 
                 var prev_evidence = state['evidence']
+                var num_fake = 0
+                if (incoming_state['settings']['num_evidences'] == '-1' || incoming_state['settings']['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
+                    num_fake = parseInt(incoming_state['settings']['cust_fake_evidences'])
+                else
+                    num_fake = difficulties[incoming_state['settings']['num_evidences']].fake
+                
                 for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
-                    if(difficulties[incoming_state['settings']['num_evidences']].fake > 0)
+                    if(num_fake > 0)
                         while (!$(document.getElementById(key+"-fake").querySelector("#checkbox")).hasClass(["bad","neutral","good","maybe"][value + 1])){
-                            quadstate(document.getElementById(key+"-fake"),true);
+                            quadstate(document.getElementById(key+"-fake"),true,true);
                         }
                     else
                         while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
@@ -462,6 +515,8 @@ function link_room(){
                 setCyclerValue("rem-interaction",incoming_state["rem_interaction"])
                 
                 filter(true)
+                if(!state_received)
+                    showCustom()
                 state_received = true
             }
 
@@ -589,7 +644,6 @@ function link_link(reconnect = false){
         $("#link_id_create_launch").hide();
         $("#link_id_disconnect").show();
 
-        toggleSanitySettings();
         document.getElementById("link_id_note").innerText = `${lang_data['{{status}}']}: ${lang_data['{{awaiting_link}}']}`;
         document.getElementById("dllink_status").className = "pending";
         sync_sjl_dl();
@@ -939,7 +993,7 @@ function send_evidence_link(reset = false){
             evi_list.push(`${key}:${reset ? 0 : $(document.getElementById(key)).hasClass("block") ? -2 : $(document.getElementById(key).querySelector("#checkbox")).hasClass("faded") ? -1 : value}`)
         }
         var cur_num_evi = document.getElementById("num_evidence").value
-        cur_num_evi = ["-5","-1"].includes(cur_num_evi) || cur_num_evi.match(/[0-9]{4}-[0-9]{4}-[0-9]{4}/g) ? document.getElementById("cust_num_evidence").value : cur_num_evi
+        cur_num_evi = cur_num_evi == -1 || cur_num_evi.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g) ? document.getElementById("cust_num_evidence").value : difficulties[cur_num_evi].evi
         dlws.send(`{"action":"EVIDENCE","evidences":"${evi_list}","num_evidence":"${cur_num_evi}"}`)
     }
 }
@@ -1089,7 +1143,6 @@ function disconnect_link(reset = false, has_status = false, code = 1005, reason 
         // Clear link_id cookie
         setCookie("tos_link_id", "", -1);
         hasDLLink = false;
-        toggleSanitySettings();
     }
 
     // 🔹 Close the socket (kill_gracefully already set above)
@@ -1157,7 +1210,11 @@ function send_state() {
             "map": state['map'],
             "map_size": state['map_size'],
             'settings': {
-                "num_evidences":document.getElementById("num_evidence").value
+                "num_evidences":document.getElementById("num_evidence").value,
+                "dif_name":document.getElementById("num_evidence").options[document.getElementById("num_evidence").selectedIndex].text,
+                "cust_num_evidences":document.getElementById("cust_num_evidence").value,
+                "cust_fake_evidences":document.getElementById("cust_fake_evidence").value,
+                "cust_hunt_length":document.getElementById("cust_hunt_length").value
             }
         })
         ws.send(outgoing_state)

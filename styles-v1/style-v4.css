@@ -1729,7 +1729,7 @@ body{
         grid-row: 2;
         display: grid;
         width:100%;
-        grid-template-rows: 35px min-content 37px min-content 37px min-content 37px auto;
+        grid-template-rows: 35px min-content 37px min-content 37px auto;
         overflow-x: hidden;
         overflow-y: auto;
     }

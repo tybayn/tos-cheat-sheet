@@ -56,10 +56,92 @@ function getLink(){
                 // document.getElementById("data-stats-link").href = `https://zero-network.net/phasmo-stats/?data-id=${data_user['id']}&avatar=${data_user['type'] == 'discord' ? ('https://cdn.discordapp.com/avatars/'+data_user['id']+'/'+data_user['avatar']) : data_user['avatar']}&username=${data_user['username']}`
                 document.getElementById("data_link_status").className = "connected"
 
-                resolve("User data loaded")
+                if($("#num_evidence option[value='sep2']").length === 0){
+                    var cust_settings = JSON.parse(getCookie("settings"))
+
+                    fetch(`https://zero-network.net/zn/difficulties/${data_user['id']}?cheatsheet=true&game=the-other-side`, {signal: AbortSignal.timeout(6000)})
+                    .then(data => data.json())
+                    .then(data => {
+                        custom_difficulties = data
+
+                        $(`#num_evidence option[value='-10']`).remove();
+                        $(`#num_evidence option[value='sep2']`).remove();
+
+                        let presets = document.getElementById("num_evidence")
+                        var opt = document.createElement('option');
+                        opt.value = "sep2";
+                        opt.innerHTML = "---My Customs---"
+                        opt.disabled = true
+                        presets.appendChild(opt)
+                        Object.entries(data).forEach(([id,value]) => {
+                            opt = document.createElement('option');
+                            opt.value = id;
+                            opt.innerHTML = value.name;
+                            presets.appendChild(opt);
+                        })
+                        opt = document.createElement('option');
+                        opt.value = "sep1";
+                        opt.innerHTML = "----------------"
+                        opt.disabled = true
+                        presets.appendChild(opt)
+                        opt = document.createElement('option');
+                        opt.value = "-10";
+                        opt.innerHTML = "Go to Difficulty Builder >>";
+                        presets.appendChild(opt);
+
+                        // Check if the currently selected difficulty is not in the list, 
+                        if(!Array.from(document.getElementById("num_evidence").options).map(opt => opt.value).includes(cust_settings.num_evidences)){
+                            if(cust_settings.num_evidences.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
+                                if($("#num_evidence option[value='"+cust_settings.num_evidences+"']").length === 0){
+                                    let presets = document.getElementById("num_evidence")
+
+                                    if($("#num_evidence option[value='sep4']").length === 0){
+                                        var opt = document.createElement('option');
+                                        opt.value = "sep4";
+                                        opt.innerHTML = "----Shared----"
+                                        opt.disabled = true
+                                        presets.appendChild(opt)
+                                    }
+
+                                    var opt = document.createElement('option');
+                                    opt.value = cust_settings.num_evidences;
+                                    opt.innerHTML = cust_settings.dif_name;
+                                    opt.selected = true
+                                    opt.disabled = true
+                                    presets.appendChild(opt);
+                                }
+                            }
+                        }
+                        document.getElementById("num_evidence").value = cust_settings.num_evidences
+
+                    })
+                    .then(data => {
+                        checkDifficulty();
+                        showCustom();
+                        updateMapDifficulty(cust_settings.num_evidences);
+                        filter();
+                        flashMode();
+                        resolve("User logged in")
+                    })
+                }
+                else{
+                    resolve("User already logged in")
+                }
             })
             
         } catch(Error){
+            if($("#num_evidence option[value='sep1']").length === 0){
+                let presets = document.getElementById("num_evidence")
+                var opt = document.createElement('option');
+                opt.value = "sep1";
+                opt.innerHTML = "----------------"
+                opt.disabled = true
+                presets.appendChild(opt)
+                opt = document.createElement('option');
+                opt.value = "-10";
+                opt.innerHTML = "Go to Difficulty Builder >>";
+                presets.appendChild(opt);
+            }
             resolve("User not logged in")
         }
     })

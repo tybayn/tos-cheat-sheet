@@ -246,7 +246,14 @@ function loadAllAndConnect(){
                     us = user_settings
 
                 for (const [key, value] of Object.entries(read_state["evidence"])){ 
-                    if (difficulties[legacy_correct[us['num_evidences']??'3N']??us['num_evidences']].fake > 0){
+                    let num_fake = 0
+                    if (us['num_evidences'] == '-1' || us['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
+                        num_fake = us['cust_fake_evidence'] ?? 0
+                    }
+                    else{
+                        num_fake = difficulties[legacy_correct[us['num_evidences']??'3N']??us['num_evidences']].fake
+                    }
+                    if (num_fake > 0){
                         if (value == 2){
                             quadstate(document.getElementById(key+"-fake"));
                         }
