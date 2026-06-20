@@ -30,5 +30,23 @@
     "{{wiki_skia_audio_li4}}": "I don’t want to hurt you.",
     "{{wiki_skia_audio_li5}}": "Hm. I’m very sorry, dear stranger.",
     "{{wiki_skia_audio_li6}}": "You have to be quiet.",
-    "{{wiki_skia_audio_p2}}": "This list is not exhaustive and more responses may be added in the future as they are discovered."
+    "{{wiki_skia_audio_p2}}": "This list is not exhaustive and more responses may be added in the future as they are discovered.",
+
+    "{{wiki_equipment}}": "Equipment",
+    "{{wiki_audio_title}}": "Audio",
+    "{{wiki_emf_title}}": "EMF",
+    "{{wiki_temperature_title}}": "Temperature",
+    "{{wiki_radiation_title}}": "Radiation",
+    "{{wiki_uv_title}}": "UV",
+    "{{wiki_writing_title}}": "Writing",
+    "{{wiki_tracking_title}}": "Tracking",
+    "{{wiki_protection_title}}": "Protection",
+    "{{wiki_cleanse_mode_title}}": "Cleansing",
+
+    "{{wiki_false_evidence_title}}": "False Evidence",
+    "{{wiki_false_evidence_p1}}": "In Identify mode, there is an option in some difficulties to have False Evidence. This is extra evidence that is given by the ghost (that they may not even have) to mislead the player.",
+    "{{wiki_false_evidence_p2}}": "<b>False evidence can be determined if the level of the evidence decreases over the course of the round.</b> For example: if you find a UV handprint on a door after it is touched, but then you find a UV splotch, that is a false evidence.",
+    "{{wiki_false_evidence_p3}}": "Keep in mind that a ghost may give its own evidence as fake evidence, so you will not want to rule out a ghost based on a false evidence.",
+    "{{wiki_false_evidence_p4}}": "Ghosts with a forced/guaranteed evidence will never give that evidence as a false evidence.",
+    "{{wiki_false_evidence_p5}}": "In contrast, true evidence will remain at the same level throughout the contract."
 }

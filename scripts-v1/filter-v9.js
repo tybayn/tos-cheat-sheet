@@ -13,6 +13,8 @@ let bpm_los_list = []
 let difficulties = {
     "3N":{"evi":3,"fake":0,"name":"{{novice}}", "hunt": 2, "speed": 1},
     "3I":{"evi":3,"fake":0,"name":"{{intermediate}}", "hunt": 2, "speed": 1},
+    "3S":{"evi":3,"fake":0,"name":"{{seasoned}}", "hunt": 2, "speed": 1},
+    "2V":{"evi":2,"fake":0,"name":"{{veteran}}", "hunt": 3, "speed": 1},
     "2E":{"evi":2,"fake":1,"name":"{{expert}}", "hunt": 2, "speed": 1},
     "1M":{"evi":1,"fake":2,"name":"{{master}}", "hunt": 3, "speed": 1},
     "2F":{"evi":2,"fake":1,"name":"{{forensic_lockdown}}", "hunt": 2, "speed": 2},
