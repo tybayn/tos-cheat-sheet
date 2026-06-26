@@ -194,10 +194,12 @@ function create_room(){
         'ghosts': state['ghosts'],
         "map": state['map'],
         'settings': {
+            "contract_type": document.getElementById("contract-type").value,
             "num_evidences":document.getElementById("num_evidence").value,
             "dif_name":document.getElementById("num_evidence").options[document.getElementById("num_evidence").selectedIndex].text,
             "cust_num_evidences":document.getElementById("cust_num_evidence").value,
             "cust_fake_evidences":document.getElementById("cust_fake_evidence").value,
+            "cust_cleanse_evidences":document.getElementById("cust_cleanse_evidence").value,
             "cust_hunt_length":document.getElementById("cust_hunt_length").value
         }
     }
@@ -339,23 +341,28 @@ function link_room(){
                     send_ml_state()
                 }
                 if (action == "EVIDENCE"){
-                    if (user_settings['num_evidences'] == '-1' || user_settings['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
-                        num_fake = parseInt(user_settings['cust_fake_evidences'])
-                    else
-                        num_fake = difficulties[user_settings['num_evidences']].fake
-                    if (num_fake > 0 )
-                        if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
-                            if(incoming_state['evidence'] == "Freezing"){
-                                tristate(document.getElementById(incoming_state['evidence']+"-fake"))
+                    if (user_settings['contract_type'] == 'cleanse'){
+                        document.querySelector(`.cycler[data-name='${incoming_state['evidence']}-cleanse']`).querySelector(".cycler-value").click()
+                    }
+                    else{
+                        if (user_settings['num_evidences'] == '-1' || user_settings['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
+                            num_fake = parseInt(user_settings['cust_fake_evidences'])
+                        else
+                            num_fake = difficulties[user_settings['num_evidences']].fake
+                        if (num_fake > 0 )
+                            if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
+                                if(incoming_state['evidence'] == "Freezing"){
+                                    tristate(document.getElementById(incoming_state['evidence']+"-fake"))
+                                }
+                                else{
+                                    quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                                }
                             }
-                            else{
-                                quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                        else
+                            if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
+                                tristate(document.getElementById(incoming_state['evidence']))
                             }
-                        }
-                    else
-                        if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
-                            tristate(document.getElementById(incoming_state['evidence']))
-                        }
+                    }
                 }
                 if (action == "POLL"){
                     polled = true
@@ -390,10 +397,16 @@ function link_room(){
                 return
             }
             else if(!incoming_state.hasOwnProperty("action")){
+
+                if (document.getElementById("contract-type").value != incoming_state['settings']['contract_type']){
+                    document.getElementById("contract-type").value = incoming_state['settings']['contract_type']
+                    changeContractType(incoming_state['settings']['contract_type'])
+                }
                 if (
                     document.getElementById("num_evidence").value != incoming_state['settings']['num_evidences'] ||
                     document.getElementById("cust_num_evidence").value != incoming_state['settings']['cust_num_evidences'] ||
                     document.getElementById("cust_fake_evidence").value != incoming_state['settings']['cust_fake_evidences'] ||
+                    document.getElementById("cust_cleanse_evidence").value != incoming_state['settings']['cust_cleanse_evidences'] ||
                     document.getElementById("cust_hunt_length").value != incoming_state['settings']['cust_hunt_length']
                 ){
                     if(incoming_state['settings']['num_evidences'] != "")
@@ -402,6 +415,8 @@ function link_room(){
                         document.getElementById("cust_num_evidence").value = incoming_state['settings']['cust_num_evidences']
                     if(incoming_state['settings']['cust_fake_evidences'] != "")
                         document.getElementById("cust_fake_evidence").value = incoming_state['settings']['cust_fake_evidences']
+                    if(incoming_state['settings']['cust_cleanse_evidences'] != "")
+                        document.getElementById("cust_cleanse_evidence").value = incoming_state['settings']['cust_cleanse_evidences']
                     if(incoming_state['settings']['cust_hunt_length'] != "")
                         document.getElementById("cust_hunt_length").value = incoming_state['settings']['cust_hunt_length']
                     
@@ -428,6 +443,7 @@ function link_room(){
 
                         $("#cust_num_evidence").attr("disabled","disabled")
                         $("#cust_fake_evidence").attr("disabled","disabled")
+                        $("#cust_cleanse_evidence").attr("disabled","disabled")
                         $("#cust_hunt_length").attr("disabled","disabled")
                         $("#ghost_modifier_speed").attr("disabled","disabled")
                         $("#ghost_modifier_speed").addClass("prevent")
@@ -439,12 +455,6 @@ function link_room(){
                     updateMapDifficulty(incoming_state['settings']['num_evidences'])
                     flashMode()
                 }
-
-                if(document.getElementById("ghost_modifier_speed").value != incoming_state['settings']['ghost_modifier']){
-                    document.getElementById("ghost_modifier_speed").value = incoming_state['settings']['ghost_modifier']
-                }
-                setGhostSpeedFromDifficulty(incoming_state['settings']['num_evidences'])
-                saveSettings()
 
                 for (const [key, value] of Object.entries(incoming_state["ghosts"])){ 
                     if (value == 0 || value == 1){
@@ -484,6 +494,12 @@ function link_room(){
                     }
                 }
 
+                if(document.getElementById("ghost_modifier_speed").value != incoming_state['settings']['ghost_modifier']){
+                    document.getElementById("ghost_modifier_speed").value = incoming_state['settings']['ghost_modifier']
+                }
+                setGhostSpeedFromDifficulty(incoming_state['settings']['num_evidences'])
+                saveSettings()
+
                 if(incoming_state.hasOwnProperty("map")){
                     var map_exists = setInterval(function(){
                         if(document.getElementById(incoming_state['map']) != null){
@@ -498,24 +514,31 @@ function link_room(){
                 }
 
                 var prev_evidence = state['evidence']
-                var num_fake = 0
-                if (incoming_state['settings']['num_evidences'] == '-1' || incoming_state['settings']['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
-                    num_fake = parseInt(incoming_state['settings']['cust_fake_evidences'])
-                else
-                    num_fake = difficulties[incoming_state['settings']['num_evidences']].fake
-                
-                for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
-                    if(num_fake > 0)
-                        while (!$(document.getElementById(key+"-fake").querySelector("#checkbox")).hasClass(["bad","neutral","good","maybe"][value + 1])){
-                            if(key == "Freezing")
-                                tristate(document.getElementById(key+"-fake"),true);
-                            else
-                                quadstate(document.getElementById(key+"-fake"),true,true);
-                        }
+                if (incoming_state['settings']['contract_type'] == 'cleanse'){
+                    for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
+                        setCyclerIndex(key+"-cleanse",value)
+                    }
+                }
+                else{
+                    var num_fake = 0
+                    if (incoming_state['settings']['num_evidences'] == '-1' || incoming_state['settings']['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
+                        num_fake = parseInt(incoming_state['settings']['cust_fake_evidences'])
                     else
-                        while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
-                            tristate(document.getElementById(key),true);
-                        }
+                        num_fake = difficulties[incoming_state['settings']['num_evidences']].fake
+                    
+                    for (const [key, value] of Object.entries(incoming_state["evidence"])){ 
+                        if(num_fake > 0)
+                            while (!$(document.getElementById(key+"-fake").querySelector("#checkbox")).hasClass(["bad","neutral","good","maybe"][value + 1])){
+                                if(key == "Freezing")
+                                    tristate(document.getElementById(key+"-fake"),true);
+                                else
+                                    quadstate(document.getElementById(key+"-fake"),true,true);
+                            }
+                        else
+                            while (!$(document.getElementById(key).querySelector("#checkbox")).hasClass(["bad","neutral","good"][value + 1])){
+                                tristate(document.getElementById(key),true);
+                            }
+                    }
                 }
 
                 setCyclerValue("speed",incoming_state["speed"])
@@ -761,13 +784,14 @@ function link_link(reconnect = false){
                 send_cur_map_link()
             }
 
-            else if (action == "GHOSTDATA"){ send_ghost_data_link(incoming_state['ghost']); return; }
-            else if (action == "GHOSTTESTS"){ send_ghost_tests_link(incoming_state['ghost']); return; }
-            else if (action == "GHOSTSELECT"){ select(document.getElementById(incoming_state['ghost'])); return; }
-            else if (action == "GHOSTNOT"){ fade(document.getElementById(incoming_state['ghost'])); return; }
-            else if (action == "GHOSTDIED"){ died(document.getElementById(incoming_state['ghost'])); return; }
+            else if (action == "GHOSTDATA"){ if (user_settings['contract_type'] == 'cleanse') return; send_ghost_data_link(incoming_state['ghost']); return; }
+            else if (action == "GHOSTTESTS"){ if (user_settings['contract_type'] == 'cleanse') return; send_ghost_tests_link(incoming_state['ghost']); return; }
+            else if (action == "GHOSTSELECT"){ if (user_settings['contract_type'] == 'cleanse') return; select(document.getElementById(incoming_state['ghost'])); return; }
+            else if (action == "GHOSTNOT"){ if (user_settings['contract_type'] == 'cleanse') return; fade(document.getElementById(incoming_state['ghost'])); return; }
+            else if (action == "GHOSTDIED"){ if (user_settings['contract_type'] == 'cleanse') return; died(document.getElementById(incoming_state['ghost'])); return; }
 
             else if (action == "GHOSTCYCLE"){
+                if (user_settings['contract_type'] == 'cleanse') return;
                 if($(document.getElementById(incoming_state['ghost'])).hasClass(["selected","died"])){
                     died(document.getElementById(incoming_state['ghost']))
                 }
@@ -777,6 +801,7 @@ function link_link(reconnect = false){
             }
 
             else if (action == "INTERACTION"){
+                if (user_settings['contract_type'] == 'cleanse') return;
                 let interaction = document.querySelector(`.cycler[data-name="${incoming_state['interaction']}"] .cycler-next`)
                 interaction.click()
                 filter()
@@ -831,25 +856,31 @@ function link_link(reconnect = false){
             }
             
             else if (action == "EVIDENCE"){
-                let num_fake = 0
-                if (user_settings['num_evidences'] == '-1' || user_settings['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
-                    num_fake = parseInt(user_settings['cust_fake_evidences'])
-                else
-                    num_fake = difficulties[user_settings['num_evidences']].fake
+                if (user_settings['contract_type'] == 'cleanse'){
 
-                if (num_fake > 0){
-                    if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
-                        if(incoming_state['evidence'] == "Freezing"){
-                            tristate(document.getElementById(incoming_state['evidence']+"-fake"))
-                        }
-                        else{
-                            quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
-                        }
-                    }
+                    document.querySelector(`.cycler[data-name='${cleanse_names[incoming_state['evidence']]}-cleanse']`).querySelector(".cycler-value").click()
                 }
                 else{
-                    if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
-                        tristate(document.getElementById(incoming_state['evidence']))
+                    let num_fake = 0
+                    if (user_settings['num_evidences'] == '-1' || user_settings['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g))
+                        num_fake = parseInt(user_settings['cust_fake_evidences'])
+                    else
+                        num_fake = difficulties[user_settings['num_evidences']].fake
+
+                    if (num_fake > 0){
+                        if(!$(document.getElementById(incoming_state['evidence']+"-fake").querySelector("#checkbox")).hasClass("block")){
+                            if(incoming_state['evidence'] == "Freezing"){
+                                tristate(document.getElementById(incoming_state['evidence']+"-fake"))
+                            }
+                            else{
+                                quadstate(document.getElementById(incoming_state['evidence']+"-fake"))
+                            }
+                        }
+                    }
+                    else{
+                        if(!$(document.getElementById(incoming_state['evidence']).querySelector("#checkbox")).hasClass("block")){
+                            tristate(document.getElementById(incoming_state['evidence']))
+                        }
                     }
                 }
             }
@@ -1013,12 +1044,22 @@ function send_empty_data_link(){
 
 function send_evidence_link(reset = false){
     if(hasDLLink){
+
         var evi_list = [];
-        for (const [key, value] of Object.entries(state['evidence'])){ 
-            evi_list.push(`${key}:${reset ? 0 : $(document.getElementById(key)).hasClass("block") ? -2 : $(document.getElementById(key).querySelector("#checkbox")).hasClass("faded") ? -1 : value}`)
-        }
         var cur_num_evi = document.getElementById("num_evidence").value
-        cur_num_evi = cur_num_evi == -1 || cur_num_evi.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g) ? document.getElementById("cust_num_evidence").value : difficulties[cur_num_evi].evi
+        if(user_settings['contract_type'] == 'cleanse'){
+            for (const [key, value] of Object.entries(state['evidence'])){ 
+                evi_list.push(`${key}:${value}`)
+            }
+            cur_num_evi = 6
+        }
+        else{
+            for (const [key, value] of Object.entries(state['evidence'])){ 
+                evi_list.push(`${key}:${reset ? 0 : $(document.getElementById(key)).hasClass("block") ? -2 : $(document.getElementById(key).querySelector("#checkbox")).hasClass("faded") ? -1 : value}`)
+            }
+            cur_num_evi = cur_num_evi == -1 || cur_num_evi.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g) ? document.getElementById("cust_num_evidence").value : difficulties[cur_num_evi].evi
+        }
+        
         dlws.send(`{"action":"EVIDENCE","evidences":"${evi_list}","num_evidence":"${cur_num_evi}"}`)
     }
 }
@@ -1235,10 +1276,12 @@ function send_state() {
             "map": state['map'],
             "map_size": state['map_size'],
             'settings': {
+                "contract_type": document.getElementById("contract-type").value,
                 "num_evidences":document.getElementById("num_evidence").value,
                 "dif_name":document.getElementById("num_evidence").options[document.getElementById("num_evidence").selectedIndex].text,
                 "cust_num_evidences":document.getElementById("cust_num_evidence").value,
                 "cust_fake_evidences":document.getElementById("cust_fake_evidence").value,
+                "cust_cleanse_evidences":document.getElementById("cust_cleanse_evidence").value,
                 "cust_hunt_length":document.getElementById("cust_hunt_length").value
             }
         })
@@ -1261,8 +1304,15 @@ function send_ml_state(){
         ws.send(`{"action":"ML-GHOSTS","ghost":"${ghost_list}"}`)
 
         var evi_list = [];
-        for (const [key, value] of Object.entries(state['evidence'])){ 
-            evi_list.push(`${key}:${$(document.getElementById(key)).hasClass("block") ? -2 : $(document.getElementById(key).querySelector("#checkbox")).hasClass("faded") ? -1 : value}`)
+        if (user_settings['contract_type'] == 'cleanse'){
+            for (const [key, value] of Object.entries(state['evidence'])){ 
+                evi_list.push(`${key}:${value}`)
+            }
+        }
+        else{
+            for (const [key, value] of Object.entries(state['evidence'])){ 
+                evi_list.push(`${key}:${$(document.getElementById(key)).hasClass("block") ? -2 : $(document.getElementById(key).querySelector("#checkbox")).hasClass("faded") ? -1 : value}`)
+            }
         }
         ws.send(`{"action":"ML-EVIDENCE","evidences":"${evi_list}"}`)
     }   

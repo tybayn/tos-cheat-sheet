@@ -1,6 +1,6 @@
 {
-    "version":"1.0.3",
-    "date":"2026-06-18",
-    "details": "- Add support for False Evidences!\n\nBug Fixes:\n - Make Ghost name smaller to prevent overflow",
-    "path":"https://tybayn.github.io/tos-cheat-sheet/assets/ZN-Desktop-Link-(TOS)-Installer-v1.0.3.msi"
+    "version":"1.1.0",
+    "date":"2026-06-25",
+    "details": "- Add support for Cleanse Mode!\n\nBug Fixes:\n - NA",
+    "path":"https://tybayn.github.io/tos-cheat-sheet/assets/ZN-Desktop-Link-(TOS)-Installer-v1.1.0.msi"
 }

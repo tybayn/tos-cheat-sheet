@@ -1077,7 +1077,7 @@
         grid-row: 2;
         display: grid;
         width:100%;
-        grid-template-rows: 60px auto;
+        grid-template-rows: 75px auto;
         grid-template-columns: 50% 50%;
         column-gap: 10px;
         overflow-x: hidden;
@@ -1123,6 +1123,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
+        margin-bottom: 7px;
     }
 
     .timers{
@@ -1161,7 +1162,7 @@
         display: grid;
         width: 100%;
         grid-template-columns: calc(50% - 5px) calc(50% - 5px);
-        grid-template-rows: 80px 60px auto 60px auto;
+        grid-template-rows: 80px 75px auto 60px auto;
         column-gap: 10px;
         overflow-x: hidden;
     }
@@ -1174,6 +1175,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-start;
+        margin-bottom: 7px;
     }
 
     .difficulty_holder{
@@ -1224,7 +1226,7 @@
         width: calc(20% - 10px) !important;
     }
     #cust_hunt_length{
-        width: calc(60% - 10px) !important;
+        width: calc(40% - 10px) !important;
     }
 
     .cust_lobby_type{

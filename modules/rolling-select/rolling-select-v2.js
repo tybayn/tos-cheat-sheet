@@ -30,9 +30,11 @@ function buildSelectors(){
             }
 
             cycler.dataset.current = current;
+            updateSAEntries(name,current);
         }
 
         function cycle(direction) {
+            if (cycler.classList.contains("cycle-disabled")) return;
             current = (Number(cycler.dataset.current) + direction + options.length) % options.length;
             update();
         }
@@ -65,6 +67,30 @@ function setCyclerValue(name, value) {
         cycler.querySelector(".cycler-value").innerHTML = options[index].includes('{{') ? options[index].replace('%','') : options[index];
     }
     cycler.querySelector("input").value = value;
+
+    updateSAEntries(name,index);
+}
+
+function setCyclerIndex(name, index) {
+    const cycler = document.querySelector(
+        `.cycler[data-name="${name.replace('_','-')}"]`
+    );
+
+    if (!cycler) return;
+
+    const options = JSON.parse(cycler.dataset.options);
+    if (index < 0 || index >= options.length) return;
+
+    cycler.dataset.current = index;
+    if (lang_data && lang_data.hasOwnProperty(options[index].replace('%',''))){
+        cycler.querySelector(".cycler-value").innerHTML = options[index].includes('{{') ? lang_data[options[index].replace('%','')] : options[index];
+    }
+    else{
+        cycler.querySelector(".cycler-value").innerHTML = options[index].includes('{{') ? options[index].replace('%','') : options[index];
+    }
+    cycler.querySelector("input").value = options[index];
+
+    updateSAEntries(name,index);
 }
 
 function loadCyclerState(incoming_state = null){

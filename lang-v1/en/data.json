@@ -1,7 +1,10 @@
 {
     "{{filters}}": "Filters",
     "{{evidence}}": "Evidence",
+    "{{identify}}": "Identify",
+    "{{cleanse}}": "Cleanse",
     "{{false_evidence}}": "False Evidence",
+    "{{cleanse_evidence}}": "Scan Charactersitics",
     "{{hunt_length}}": "Hunt Length",
     "{{novice}}": "Novice",
     "{{intermediate}}": "Intermediate",
@@ -44,7 +47,7 @@
     "{{candle_no_interaction}}": "No Interaction",
 
     "{{rem}}": "FLX-Pod",
-    "{{rem_interacts}}": "Interacts",
+    "{{rem_interacts}}": "Interacts (Off)",
     "{{rem_no_interaction}}": "No Interaction",
 
     "{{lights}}": "Lights",

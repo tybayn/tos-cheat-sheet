@@ -198,8 +198,8 @@ function loadAllAndConnect(){
                     </div>
                     `
                     evidence_list_cleanse.innerHTML += `
-                    <div class="cycler" data-name="${key}-cleanse" data-options='["-",${Array.from(value).map(e => `"${e}"`).join(",")}]' data-current="0">
-                        <div class="cycler-label">${key}</div>
+                    <div class="cycler" data-name="${cleanse_names[key]}-cleanse" data-group="evidence" data-options='["-",${Array.from(value).map(e => `"${e}"`).join(",")}]' data-current="0">
+                        <div class="cycler-label">${cleanse_names[key]}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
                         <button class="cycler-next" type="button">&gt;</button>
@@ -245,57 +245,64 @@ function loadAllAndConnect(){
                 else
                     us = user_settings
 
-                for (const [key, value] of Object.entries(read_state["evidence"])){ 
-                    let num_fake = 0
-                    if (us['num_evidences'] == '-1' || us['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
-                        num_fake = parseInt(us['cust_fake_evidences'] ?? 0)
-                    }
-                    else{
-                        num_fake = difficulties[legacy_correct[us['num_evidences']??'3N']??us['num_evidences']].fake
-                    }
-                    if (num_fake > 0){
-                        if (value == 2){
-                            quadstate(document.getElementById(key+"-fake"));
-                        }
-                        else if (value == 1){
-                            quadstate(document.getElementById(key+"-fake"));
-                            quadstate(document.getElementById(key+"-fake"));
-                        }
-                        else if (value == -1){
-                            quadstate(document.getElementById(key+"-fake"));
-                            quadstate(document.getElementById(key+"-fake"));
-                            quadstate(document.getElementById(key+"-fake"));
-                        }
-                    }
-                    else{
-                        if (value == 1){
-                            tristate(document.getElementById(key));
-                        }
-                        else if (value == -1){
-                            tristate(document.getElementById(key));
-                            tristate(document.getElementById(key));
-                        }
+                if(us['contract_type'] == 'cleanse'){
+                    for (const [key, value] of Object.entries(read_state["evidence"])){ 
+                        setCyclerIndex(key+"-cleanse",value)
                     }
                 }
+                else{
+                    for (const [key, value] of Object.entries(read_state["evidence"])){ 
+                        let num_fake = 0
+                        if (us['num_evidences'] == '-1' || us['num_evidences'].match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
+                            num_fake = parseInt(us['cust_fake_evidences'] ?? 0)
+                        }
+                        else{
+                            num_fake = difficulties[legacy_correct[us['num_evidences']??'3N']??us['num_evidences']].fake
+                        }
+                        if (num_fake > 0){
+                            if (value == 2){
+                                quadstate(document.getElementById(key+"-fake"));
+                            }
+                            else if (value == 1){
+                                quadstate(document.getElementById(key+"-fake"));
+                                quadstate(document.getElementById(key+"-fake"));
+                            }
+                            else if (value == -1){
+                                quadstate(document.getElementById(key+"-fake"));
+                                quadstate(document.getElementById(key+"-fake"));
+                                quadstate(document.getElementById(key+"-fake"));
+                            }
+                        }
+                        else{
+                            if (value == 1){
+                                tristate(document.getElementById(key));
+                            }
+                            else if (value == -1){
+                                tristate(document.getElementById(key));
+                                tristate(document.getElementById(key));
+                            }
+                        }
+                    }
 
-                for (const [key, value] of Object.entries(read_state['ghosts'])){ 
-                    if (value == 0){
-                        fade(document.getElementById(key), true);
-                    }
-                    else if (value == -2){
-                        died(document.getElementById(key), true, true);
-                    }
-                    else if (value == -1){
-                        remove(document.getElementById(key), true, true);
-                    }
-                    else if (value == 2){
-                        select(document.getElementById(key), true, true);
-                    }
-                    else if (value == 3){
-                        guess(document.getElementById(key), true, true);
-                    }
-                    else{
-                        state['ghosts'][key] = value
+                    for (const [key, value] of Object.entries(read_state['ghosts'])){ 
+                        if (value == 0){
+                            fade(document.getElementById(key), true);
+                        }
+                        else if (value == -2){
+                            died(document.getElementById(key), true, true);
+                        }
+                        else if (value == -1){
+                            remove(document.getElementById(key), true, true);
+                        }
+                        else if (value == 2){
+                            select(document.getElementById(key), true, true);
+                        }
+                        else if (value == 3){
+                            guess(document.getElementById(key), true, true);
+                        }
+                        else{
+                            state['ghosts'][key] = value
+                        }
                     }
                 }
 

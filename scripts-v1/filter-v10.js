@@ -11,15 +11,15 @@ let all_maps = {}
 let bpm_list = []
 let bpm_los_list = []
 let difficulties = {
-    "3N":{"evi":3,"fake":0,"name":"{{novice}}", "hunt": 2, "speed": 1},
-    "3I":{"evi":3,"fake":0,"name":"{{intermediate}}", "hunt": 2, "speed": 1},
-    "3S":{"evi":3,"fake":0,"name":"{{seasoned}}", "hunt": 2, "speed": 1},
-    "2V":{"evi":2,"fake":0,"name":"{{veteran}}", "hunt": 3, "speed": 1},
-    "2E":{"evi":2,"fake":1,"name":"{{expert}}", "hunt": 2, "speed": 1},
-    "1M":{"evi":1,"fake":2,"name":"{{master}}", "hunt": 3, "speed": 1},
-    "2F":{"evi":2,"fake":1,"name":"{{forensic_lockdown}}", "hunt": 2, "speed": 2},
-    "3S":{"evi":3,"fake":1,"name":"{{streamer_bait}}", "hunt": 2, "speed": 2},
-    "1MA":{"evi":1,"fake":0,"name":"{{masochist}}", "hunt": 3, "speed": 5},
+    "3N":{"evi":3,"fake":0,"name":"{{novice}}", "hunt": 2, "speed": 1, "cleanse": 2},
+    "3I":{"evi":3,"fake":0,"name":"{{intermediate}}", "hunt": 2, "speed": 1, "cleanse": 3},
+    "3S":{"evi":3,"fake":0,"name":"{{seasoned}}", "hunt": 2, "speed": 1, "cleanse": 4},
+    "2V":{"evi":2,"fake":0,"name":"{{veteran}}", "hunt": 3, "speed": 1, "cleanse": 4},
+    "2E":{"evi":2,"fake":1,"name":"{{expert}}", "hunt": 2, "speed": 1, "cleanse": 4},
+    "1M":{"evi":1,"fake":2,"name":"{{master}}", "hunt": 3, "speed": 1, "cleanse": 5},
+    "2F":{"evi":2,"fake":1,"name":"{{forensic_lockdown}}", "hunt": 2, "speed": 2, "cleanse": 5},
+    "3S":{"evi":3,"fake":1,"name":"{{streamer_bait}}", "hunt": 2, "speed": 2, "cleanse": 4},
+    "1MA":{"evi":1,"fake":0,"name":"{{masochist}}", "hunt": 3, "speed": 5, "cleanse": 4},
     "-1":{"name":"{{custom}}"}
 }
 let legacy_correct = {
@@ -28,7 +28,7 @@ let legacy_correct = {
 }
 
 var state = {"evidence":{},"speed":"-","los_speed":"-","holy_water":"-","candle_interaction":"-","rem_interaction":"-","light_interaction":"-","radio_interaction":"-","ghosts":{},"map":"ravenwood","map_size":"M"}
-var user_settings = {"num_evidences":"3N","cust_num_evidences":"3","cust_fake_evidences":"0","cust_hunt_length":"3","ghost_modifier":1,"volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
+var user_settings = {"num_evidences":"3N","cust_num_evidences":"3","cust_fake_evidences":"0","cust_hunt_length":"3","contract_type":"identify","cust_cleanse_evidence":4,"ghost_modifier":1,"volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
 
 let znid = getCookie("tos_znid")
 
@@ -421,6 +421,20 @@ function revive(){
 function filter(ignore_link=false){
     state["evidence"] = {}
 
+    if(document.getElementById("contract-type").value == "cleanse"){
+        let cyclers = document.querySelectorAll(`.cycler[data-group="evidence"]`);
+        Array.from(cyclers).forEach((x) => {
+            state["evidence"][x.dataset.name.split('-')[0]] = parseInt(x.dataset.current)
+        })
+        Array.from(all_ghosts).forEach((x) => {
+            state["ghosts"][x] = 1
+        })
+        setCookie("tos_state",JSON.stringify(state),1)
+        if (hasLink && !ignore_link){send_state()}
+        if (hasDLLink){send_evidence_link();}
+        return;
+    }
+
     for (var i = 0; i < Object.keys(all_evidence).length; i++){
         state["evidence"][Object.keys(all_evidence)[i]] = 0
     }
@@ -810,7 +824,7 @@ function filter(ignore_link=false){
     })
 
     if (num_evi == 3){
-        Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
+        Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi)).forEach(function(item){
             if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                 var checkbox = document.getElementById(item+evi_type);
                 $(checkbox).addClass("block")
@@ -825,7 +839,7 @@ function filter(ignore_link=false){
     else if (num_evi == 2){
         var keep_evi = evi_array
         if (keep_evi.length == 2){
-            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
+            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi) && !evi_array.includes(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -837,7 +851,7 @@ function filter(ignore_link=false){
             })
         }
         else if (keep_evi.length > 0){
-            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
+            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -865,7 +879,7 @@ function filter(ignore_link=false){
             })
         }
         else if (keep_evi.length > 0 && maxed){
-            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi)).forEach(function(item){
+            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) &&  (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -1419,10 +1433,17 @@ function flashMode(custom_message=null){
             cur_name = lang_data[difficulties[cur_evidence].name]
             cur_evidence = difficulties[cur_evidence].evi
         }
-        let flash_html = `${cur_name}<span>(${parseInt(cur_evidence)} ${lang_data['{{evidence}}']})</span>`
-        if (fake_evidence > 0){
-            flash_html += ` <span style="color:#d69a9a;">(${parseInt(fake_evidence)} ${lang_data['{{false_evidence}}']})</span>`
+        let flash_html = ""
+        if (document.getElementById("contract-type").value == "cleanse"){
+            flash_html = `${cur_name}`
         }
+        else{
+            flash_html = `${cur_name}<span>(${parseInt(cur_evidence)} ${lang_data['{{evidence}}']})</span>`
+            if (fake_evidence > 0){
+                flash_html += ` <span style="color:#d69a9a;">(${parseInt(fake_evidence)} ${lang_data['{{false_evidence}}']})</span>`
+            }
+        }
+        
         document.getElementById("game_mode").innerHTML = flash_html
     }
     $("#game_mode").fadeIn(500,function () {
@@ -1452,6 +1473,8 @@ function saveSettings(reset = false){
     user_settings['cust_num_evidences'] = document.getElementById("cust_num_evidence").value
     user_settings['cust_fake_evidences'] = document.getElementById("cust_fake_evidence").value
     user_settings['cust_hunt_length'] = document.getElementById("cust_hunt_length").value
+    user_settings['contract_type'] = document.getElementById("contract-type").value
+    user_settings['cust_cleanse_evidence'] = document.getElementById("cust_cleanse_evidence").value
     user_settings['bpm_type'] = document.getElementById("bpm_type").checked ? 1 : 0;
     user_settings['bpm'] = reset ? 0 : parseInt(document.getElementById('input_bpm').innerHTML.split("<br>")[0])
     user_settings['domo_side'] = $("#domovoi").hasClass("domovoi-flip") ? 1 : 0;
@@ -1472,7 +1495,7 @@ function loadSettings(){
     try{
         user_settings = JSON.parse(getCookie("tos_settings"))
     } catch (error) {
-        user_settings = {"num_evidences":"3N","cust_num_evidences":"3","cust_fake_evidences":"0","cust_hunt_length":"3","ghost_modifier":1,"volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
+        user_settings = {"num_evidences":"3N","cust_num_evidences":"3","cust_fake_evidences":"0","cust_hunt_length":"3","contract_type":"identify","cust_cleanse_evidence":4,"ghost_modifier":1,"volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
     }
 
     user_settings['num_evidences'] = user_settings['num_evidences'] == "" ? "3" : user_settings['num_evidences']
@@ -1510,6 +1533,9 @@ function loadSettings(){
     document.getElementById("cust_num_evidence").value = load_default('cust_num_evidences','3')
     document.getElementById("cust_fake_evidence").value = load_default('cust_fake_evidences','0')
     document.getElementById("cust_hunt_length").value = load_default('cust_hunt_length','3')
+    document.getElementById("contract-type").value = load_default('contract_type','identify')
+    document.getElementById("contract-type-2").value = load_default('contract_type','identify')
+    document.getElementById("cust_cleanse_evidence").value = load_default('cust_cleanse_evidence',4)
     document.getElementById("priority_sort").checked = load_default('priority_sort',0) == 1;
     document.getElementById("disable_particles").checked = load_default('disable_particles',0) == 1;
     document.getElementById("keep_alive").checked = load_default('keep_alive',0) == 1;
@@ -1574,6 +1600,7 @@ function loadSettings(){
     toggleVoicePrefix()
     adjustOffset(0)
     setTempo()
+    changeContractType(load_default('contract_type','identify'))
     checkDifficulty()
     updateMapDifficulty(user_settings['num_evidences'])
     // showCustom()
@@ -1584,7 +1611,7 @@ function loadSettings(){
 }
 
 function resetSettings(){
-    user_settings = {"num_evidences":"3N","cust_num_evidences":"3","cust_fake_evidences":"0","cust_hunt_length":"3","ghost_modifier":1,"volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
+    user_settings = {"num_evidences":"3N","cust_num_evidences":"3","cust_fake_evidences":"0","cust_hunt_length":"3","contract_type":"identify","cust_cleanse_evidence":4,"ghost_modifier":1,"volume":50,"mute_broadcast":0,"mute_timer_toggle":0,"mute_timer_countdown":0,"timer_count_up":0,"timer_split":1,"adaptive_evidence":0,"hide_descriptions":0,"layout":0,"hide_sanity_speed":0,"offset":0.0,"bpm_type":0,"bpm":0,"domo_side":0,"priority_sort":0,"map":"ravenwood","theme":"Default","keep_alive":0,"disable_particles":0,"show_event_maps":0,"voice_prefix":0}
     document.getElementById("modifier_volume").value = load_default('volume',50)
     document.getElementById("mute_broadcast").checked = load_default('mute_broadcast',0) == 1 
     document.getElementById("mute_timer_toggle").checked = load_default('mute_timer_toggle',0) == 1 
@@ -1602,6 +1629,9 @@ function resetSettings(){
     document.getElementById("cust_num_evidence").value = load_default('cust_num_evidences','3')
     document.getElementById("cust_fake_evidence").value = load_default('cust_fake_evidences','0')
     document.getElementById("cust_hunt_length").value = load_default('cust_hunt_length','3')
+    document.getElementById("contract-type").value = load_default('contract_type','identify')
+    document.getElementById("contract-type-2").value = load_default('contract_type','identify')
+    document.getElementById("cust_cleanse_evidence").value = load_default('cust_cleanse_evidence',4)
     document.getElementById("bpm_type").checked = load_default('bpm_type',0) == 1
     document.getElementById("disable_particles").checked = load_default('disable_particles',0) == 1
     document.getElementById("keep_alive").checked = load_default('keep_alive',0) == 1
@@ -1626,6 +1656,51 @@ function resetSettings(){
     setCookie("tos_settings",JSON.stringify(user_settings),30)
 }
 
+function changeContractType(contract_type){
+    document.getElementById("contract-type").value = contract_type
+    document.getElementById("contract-type-2").value = contract_type
+    if (contract_type == "cleanse"){
+        $("#evidence").hide()
+        $("#evidence-fake").hide()
+        $("#evidence-cleanse").show()
+        $(document.querySelectorAll(`.cycler[data-group="hunt"]`)).addClass("cycle-disabled")
+        $(document.querySelectorAll(`.cycler[data-group="interactions"]`)).addClass("cycle-disabled")
+        $("#cards").hide()
+        $("#sa-window").show()
+    }
+    else{
+        $("#sa-window").hide()
+        $("#cards").show()
+        $(document.querySelectorAll(`.cycler[data-group="hunt"]`)).removeClass("cycle-disabled")
+        $(document.querySelectorAll(`.cycler[data-group="interactions"]`)).removeClass("cycle-disabled")
+        let num_evi = document.getElementById("num_evidence").value
+        if (num_evi == "-1" || num_evi.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
+            if (parseInt(document.getElementById("cust_fake_evidence").value) > 0){
+                $("#evidence-cleanse").hide()
+                $("#evidence").hide()
+                $("#evidence-fake").show()
+            }
+            else{
+                $("#evidence-cleanse").hide()
+                $("#evidence-fake").hide()
+                $("#evidence").show()
+            }
+        }
+        else{
+            if (difficulties[num_evi].fake > 0){
+                $("#evidence-cleanse").hide()
+                $("#evidence").hide()
+                $("#evidence-fake").show()
+            }
+            else{
+                $("#evidence-cleanse").hide()
+                $("#evidence-fake").hide()
+                $("#evidence").show()
+            }
+        }
+    }
+}
+
 function checkDifficulty(){
 
     let dif_opt = document.getElementById("num_evidence").value 
@@ -1641,12 +1716,14 @@ function checkDifficulty(){
         num_fake = document.getElementById("cust_fake_evidence").value
         $("#cust_num_evidence").attr("disabled","disabled")
         $("#cust_fake_evidence").attr("disabled","disabled")
+        $("#cust_cleanse_evidence").attr("disabled","disabled")
         $("#cust_hunt_length").attr("disabled","disabled")
         $("#ghost_modifier_speed").attr("disabled","disabled")
         $("#ghost_modifier_speed").addClass("prevent")
         if(custom_difficulties.hasOwnProperty(dif_opt)){
             document.getElementById("cust_num_evidence").value = custom_difficulties[dif_opt].settings.num_evidence
             document.getElementById("cust_fake_evidence").value = custom_difficulties[dif_opt].settings.fake_evidence
+            document.getElementById("cust_cleanse_evidence").value = custom_difficulties[dif_opt].settings.cleanse_evidence
             document.getElementById("cust_hunt_length").value = custom_difficulties[dif_opt].settings.hunt_duration
             num_fake = custom_difficulties[dif_opt].settings.fake_evidence
         }
@@ -1667,6 +1744,7 @@ function checkDifficulty(){
         else{
             $("#cust_num_evidence").removeAttr("disabled")
             $("#cust_fake_evidence").removeAttr("disabled")
+            $("#cust_cleanse_evidence").removeAttr("disabled")
             $("#cust_hunt_length").removeAttr("disabled")
             $("#ghost_modifier_speed").removeAttr("disabled")
             $("#ghost_modifier_speed").removeClass("prevent")
@@ -1694,7 +1772,7 @@ function checkDifficulty(){
         }
     }
 
-    if (dif_opt == "CL"){
+    if (document.getElementById("contract-type").value == "cleanse"){
         $("#evidence").hide()
         $("#evidence-fake").hide()
         $("#evidence-cleanse").show()
@@ -1729,7 +1807,7 @@ function showCustom(){
             }
         }
         if (mquery.matches){
-            document.getElementById("filter-content").style.gridTemplateRows = "140px 60px auto 60px auto"
+            document.getElementById("filter-content").style.gridTemplateRows = "140px 75px auto 60px auto"
         }
         else{
             document.getElementById("evidence").style.marginTop = "56px";
@@ -1741,7 +1819,7 @@ function showCustom(){
     else{
         $("#custom_options").hide()
         if (mquery.matches){
-            document.getElementById("filter-content").style.gridTemplateRows = "80px 60px auto 60px auto"
+            document.getElementById("filter-content").style.gridTemplateRows = "80px 75px auto 60px auto"
         }
         else{
             document.getElementById("evidence").style.marginTop = "28px";

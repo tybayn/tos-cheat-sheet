@@ -22,6 +22,15 @@ evi_icons = {
     "Writing": "imgs/writing-icon.png",
 }
 
+cleanse_names = {
+    "Audio": "Audio", 
+    "EMF 20+": "EMF",
+    "Freezing": "Thermal",
+    "Radiation": "Radiation",
+    "UV": "UV",
+    "Writing": "Writing",
+}
+
 los_range = [
     "{{los_range_0}}",
     "{{los_range_1}}",

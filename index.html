@@ -44,14 +44,15 @@
             return controller.signal;
         };
     </script>
-    <script src="scripts-v1/ghost_template-v4.js"></script>
-    <link rel="stylesheet" href="styles-v1/style-v5.css"/>
-    <link rel="stylesheet" href="styles-v1/style-mobile-v5.css"/>
+    <script src="scripts-v1/ghost_template-v5.js"></script>
+    <link rel="stylesheet" href="styles-v1/style-v6.css"/>
+    <link rel="stylesheet" href="styles-v1/style-mobile-v6.css"/>
     <link rel="stylesheet" href="themes-v1/themes-v1.css"/>
+    <link rel="stylesheet" href="sa-v1/sa-v1.css"/>
     <link rel="stylesheet" href="login-v1/login-v1.css" >
     <link rel="stylesheet" href="wiki-v1/wiki-v2.css" >
     <link rel="stylesheet" href="wiki-v1/wiki-spoiler-v1.css" >
-    <link rel="stylesheet" href="modules/rolling-select/rolling-select.css" >
+    <link rel="stylesheet" href="modules/rolling-select/rolling-select-v2.css" >
 </head>
 
 <body>
@@ -564,7 +565,7 @@
                 <div class="modifier_volume yfont white">
                     <img class="zndlinfo" src="imgs/question.png" onclick="showZNDLInfo(event)">
                     {{desktop_link}}
-                    <a id="zndl-download-icon" class="download" href="assets/ZN-Desktop-Link-(TOS)-Installer-v1.0.3.msi" download="ZN-Desktop-Link-(TOS)-Installer-v1.0.3.msi" onclick="showZNDLInfo(event)"><img class="download_icon" src="imgs/download.png" alt="Download ZN-Desktop-Link"></a>
+                    <a id="zndl-download-icon" class="download" href="assets/ZN-Desktop-Link-(TOS)-Installer-v1.1.0.msi" download="ZN-Desktop-Link-(TOS)-Installer-v1.1.0.msi" onclick="showZNDLInfo(event)"><img class="download_icon" src="imgs/download.png" alt="Download ZN-Desktop-Link"></a>
                 </div>
                 <div class="journal_link">
                     <input type="text" placeholder="DT-XXXXX" id="link_id" class="text" value="" disabled style="color:#444;">
@@ -580,7 +581,7 @@
             </div>
              <div id="zndl-download-button" class="find-overlay">
                 {{looking_for_overlay}}<br>
-                <a href="assets/ZN-Desktop-Link-(TOS)-Installer-v1.0.3.msi" download="ZN-Desktop-Link-(TOS)-Installer-v1.0.3.msi" onclick="showZNDLInfo(event)" style="text-decoration: none;">
+                <a href="assets/ZN-Desktop-Link-(TOS)-Installer-v1.1.0.msi" download="ZN-Desktop-Link-(TOS)-Installer-v1.1.0.msi" onclick="showZNDLInfo(event)" style="text-decoration: none;">
                     <div class="button-zn"><img class="download_icon" src="imgs/download.png" style="filter: invert(1); padding-right: 5px;">ZN-Desktop-Link</div>
                 </a>
             </div>
@@ -766,7 +767,7 @@
     <div id="debug_tab" style="display: none;" onclick="showDebug(event)">
         <img src="imgs/terminal.png" width="21">
     </div>
-    
+
     <div class="data">
         <div id="menu" class="menu" ontouchstart="lock(event)" ontouchend="move(event,{'left':[toggleFilterTools,[]],'right':[toggleFilterTools,[]],'down':[closeMenu,[]]})">
             <div id="menu_tab" onpointerdown="menuTabDown(event)" onpointermove="menuTabMove(event)" onpointerup="menuTabEnd()" onpointercancel="menuTabEnd()" onclick="toggleMenu()">▲ ▲ ▲</div>
@@ -777,6 +778,10 @@
             <div id="tools-content" class="tools-content" style="display: none;">
                 <div class="timer_title yfont white">
                     {{timers}}
+                    <select id="contract-type-2" class="num_evidence" onchange="changeContractType(this.value);saveSettings();filter();">
+                        <option value="identify" selected>{{identify}}</option>
+                        <option value="cleanse">{{cleanse}}</option>
+                    </select>
                 </div>
                 <div class="timers">
                     <div class="timer_block">
@@ -864,6 +869,10 @@
             <div id="filter-content" class="filter-content">
                 <div class="evidence_title yfont white">
                     {{evidence}}
+                    <select id="contract-type" class="num_evidence" onchange="changeContractType(this.value);saveSettings();filter();">
+                        <option value="identify" selected>{{identify}}</option>
+                        <option value="cleanse">{{cleanse}}</option>
+                    </select>
                 </div>
                 
                 <div class="difficulty_holder">
@@ -888,7 +897,17 @@
                         <option value="1">1</option>
                         <option value="0">0</option>
                     </select>
-                    <select name="cust_hunt_length" id="cust_hunt_length" class="cust_num_evidence"  style="width: calc(60% - 2px); margin-left: 2px;" onchange="filter();updateMapDifficulty(this.value);saveSettings();">
+                    <select name="cust_num_evidence" id="cust_cleanse_evidence" class="cust_num_evidence" style="width: calc(20% - 2px); margin-right: 2px;" onchange="updateNumSAEntries();filter();flashMode();saveSettings();">
+                        <option value="title" disabled>{{cleanse_evidence}}</option>
+                        <option value="sep" disabled>---------------</option>
+                        <option value="6">6</option>
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option>
+                    </select>
+                    <select name="cust_hunt_length" id="cust_hunt_length" class="cust_num_evidence"  style="width: calc(40% - 2px); margin-left: 2px;" onchange="filter();updateMapDifficulty(this.value);saveSettings();">
                         <option value="title" disabled>{{hunt_length}}</option>
                         <option value="sep" disabled>---------------</option>
                         <option value="1">{{none}}</option>
@@ -912,7 +931,7 @@
                 </div>
                 
                 <div class="speed">
-                    <div class="cycler" data-name="speed" data-options='["-", "{{%speed_normal}}", "{{%speed_fast}}"]'>
+                    <div class="cycler" data-name="speed" data-group="hunt" data-options='["-", "{{%speed_normal}}", "{{%speed_fast}}"]'>
                         <div class="cycler-label">{{speed}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -920,7 +939,7 @@
                         <input type="hidden">
                         <div class="cycler-counter"></div>
                     </div>
-                    <div class="cycler" data-name="los-speed" data-options='["-", "{{%los_slow}}", "{{%los_normal}}", "{{%los_medium}}", "{{%los_fast}}"]'>
+                    <div class="cycler" data-name="los-speed" data-group="hunt" data-options='["-", "{{%los_slow}}", "{{%los_normal}}", "{{%los_medium}}", "{{%los_fast}}"]'>
                         <div class="cycler-label">{{los_speed}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -928,7 +947,7 @@
                         <input type="hidden">
                         <div class="cycler-counter"></div>
                     </div>
-                    <div class="cycler" data-name="holy-water" data-options='["-", "{{%holy_water_normal}}", "{{%holy_water_long}}"]'>
+                    <div class="cycler" data-name="holy-water" data-group="hunt" data-options='["-", "{{%holy_water_normal}}", "{{%holy_water_long}}"]'>
                         <div class="cycler-label">{{holy_water}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -941,7 +960,7 @@
                     {{interactions}}
                 </div>
                 <div class="interactions">
-                    <div class="cycler" data-name="candle-interaction" data-options='["-", "{{%candle_blow_out}}", "{{%candle_no_interaction}}"]'>
+                    <div class="cycler" data-name="candle-interaction" data-group="interactions" data-options='["-", "{{%candle_blow_out}}", "{{%candle_no_interaction}}"]'>
                         <div class="cycler-label">{{candles}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -949,7 +968,7 @@
                         <input type="hidden">
                         <div class="cycler-counter"></div>
                     </div>
-                    <div class="cycler" data-name="rem-interaction" data-options='["-", "{{%rem_interacts}}", "{{%rem_no_interaction}}"]'>
+                    <div class="cycler" data-name="rem-interaction" data-group="interactions" data-options='["-", "{{%rem_interacts}}", "{{%rem_no_interaction}}"]'>
                         <div class="cycler-label">{{rem}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -957,7 +976,7 @@
                         <input type="hidden">
                         <div class="cycler-counter"></div>
                     </div>
-                    <div class="cycler" data-name="light-interaction" data-options='["-", "{{%light_on_only}}", "{{%light_off_only}}", "{{%light_on_off}}"]'>
+                    <div class="cycler" data-name="light-interaction" data-group="interactions" data-options='["-", "{{%light_on_only}}", "{{%light_off_only}}", "{{%light_on_off}}"]'>
                         <div class="cycler-label">{{lights}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -965,7 +984,7 @@
                         <input type="hidden">
                         <div class="cycler-counter"></div>
                     </div>
-                    <div class="cycler" data-name="radio-interaction" data-options='["-", "{{%radio_on_only}}", "{{%radio_off_only}}", "{{%radio_on_off}}"]'>
+                    <div class="cycler" data-name="radio-interaction" data-group="interactions" data-options='["-", "{{%radio_on_only}}", "{{%radio_off_only}}", "{{%radio_on_off}}"]'>
                         <div class="cycler-label">{{radio}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -987,6 +1006,25 @@
         </div>
 
         <div id="cards" class="cards" onscroll="updateScaling()"><div class="dot-flashing"></div></div>
+
+        <div id="sa-window" style="display: none;">
+            <div id="sa-window-header" onmousedown="moveSA(event)">
+                SA-2000 Console Prompt
+            </div>
+            <div class="sa-window-body">
+                COMMANDS:<br>
+                ---------------------<br>
+                <div id="sa-Audio" style="display: none;">ADD AUDIO 1</div>
+                <div id="sa-EMF" style="display: none;">ADD EMF 1</div>
+                <div id="sa-Thermal" style="display: none;">ADD THERMAL 1</div>
+                <div id="sa-Radiation" style="display: none;">ADD RADIATION 1</div>
+                <div id="sa-UV" style="display: none;">ADD UV 1</div>
+                <div id="sa-Writing" style="display: none;">ADD WRITING 1</div>
+                <div id="sa-scan" style="display: none;">SCAN</div>
+                <br>
+                <div id="need-more" style="color: red;">! 4 MORE EVIDENCE NEEDED !</div>
+            </div>
+        </div>
     </div>
 
     <div id="domovoi" style="display: none;">
@@ -1090,13 +1128,14 @@
     <script src="scripts-v1/timer-v3.js"></script>
     <script src="login-v1/login-v2.js"></script>
     <script src="wiki-v1/wiki-v1.js"></script>
-    <script src="scripts-v1/filter-v9.js"></script>
-    <script src="scripts-v1/wslink-v7.js"></script>
-    <script src="scripts-v1/zn-v7.js"></script>
+    <script src="scripts-v1/filter-v10.js"></script>
+    <script src="scripts-v1/wslink-v8.js"></script>
+    <script src="scripts-v1/zn-v8.js"></script>
+    <script src="sa-v1/sa-v1.js"></script>
     <script src="scripts-v1/search-v1.js"></script>
     <script src="scripts-v1/voice_en-v1.js"></script>
     <script src="scripts-v1/voice_recognition-v1.js"></script>
-    <script src="modules/rolling-select/rolling-select.js"></script>
+    <script src="modules/rolling-select/rolling-select-v2.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@8.0.13/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@8.0.13/dist/ionicons/ionicons.js"></script>
     <script>
