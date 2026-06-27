@@ -1847,7 +1847,7 @@ function changeMap(elem,map,ignore_link=false){
     $(elem).addClass("selected_map")
     $(".map_image").css("background-image",document.getElementById("map_event_check_box").checked && document.getElementById("map-type").value == '0' && all_maps.hasOwnProperty(`${elem.id}-e`) ? `url(${all_maps[`${elem.id}-e`]})` : "url("+map+")")
 
-    $("#map-explorer-link-2").attr("href",`https://zero-network.net/the-other-side/map-explorer/?share=${elem.id}`)
+    $("#map-explorer-link-2").attr("href",`https://zero-network.net/tos-cheat-sheet/map-explorer/?share=${elem.id}`)
 
     state['map'] = elem.id
     state['map_size'] = elem.querySelector(".map_size").innerText

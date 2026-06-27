@@ -2442,11 +2442,18 @@ body{
         justify-content: flex-end;
     }
 
-    .flex-holder-split,.flex-holder-split-map{
+    .flex-holder-split{
         display: flex;
         width: calc(100% - 20px);
         margin-left: 10px;
         justify-content: space-between;
+    }
+
+    .flex-holder-split-map{
+        display: flex;
+        width: calc(100% - 20px);
+        margin-left: 10px;
+        justify-content: flex-end;
     }
 
     .button-gray{
