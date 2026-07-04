@@ -18,7 +18,7 @@ let difficulties = {
     "2E":{"evi":2,"fake":1,"name":"{{expert}}", "hunt": 2, "speed": 1, "cleanse": 4},
     "1M":{"evi":1,"fake":2,"name":"{{master}}", "hunt": 3, "speed": 1, "cleanse": 5},
     "2F":{"evi":2,"fake":1,"name":"{{forensic_lockdown}}", "hunt": 2, "speed": 2, "cleanse": 5},
-    "3S":{"evi":3,"fake":1,"name":"{{streamer_bait}}", "hunt": 2, "speed": 2, "cleanse": 4},
+    "3SB":{"evi":3,"fake":1,"name":"{{streamer_bait}}", "hunt": 2, "speed": 2, "cleanse": 4},
     "1MA":{"evi":1,"fake":0,"name":"{{masochist}}", "hunt": 3, "speed": 5, "cleanse": 4},
     "-1":{"name":"{{custom}}"}
 }
@@ -1894,7 +1894,7 @@ function playSound(resource){
 
 function setGhostSpeedFromDifficulty(dif){
     if(!dif.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g) && !["-1","CL"].includes(dif)){
-        speed = {"3N":1,"3I":1,"2E":1,"1M":1,"2F":2,"3S":2,"1MA":5}[dif]
+        speed = difficulties[dif].speed
         document.getElementById("ghost_modifier_speed").value = speed
     }
 }
