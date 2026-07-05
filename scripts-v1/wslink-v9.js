@@ -1125,15 +1125,15 @@ function send_interaction_link(reset = false){
 function send_map_preload_link(){
     if(hasDLLink){
         let non_event_maps = Object.entries(all_maps).filter(([key]) => !key.endsWith('-e')).map(([, value]) => value).join('","');
-        cur_map_link = document.getElementById("map_image").style.backgroundImage.slice(4,-1).replace(/"/g,"")
-        dlws.send(`{"action":"MAPPRELOAD","message":"${cur_map_link}","list":["${Object.values(all_maps).join('","')}"]}`)
+        cur_map_link = document.getElementById("map_image").style.backgroundImage.slice(4,-1).replace(/"/g,"").replace("/zn/","/zn/dl/")
+        dlws.send(`{"action":"MAPPRELOAD","message":"${cur_map_link}","list":["${Object.values(all_maps).join('","').replace("/zn/","/zn/dl/")}"]}`)
     }
 
 }
 
 function send_cur_map_link(){
     if(hasDLLink){
-        cur_map_link = document.getElementById("map_image").style.backgroundImage.slice(4,-1).replace(/"/g,"")
+        cur_map_link = document.getElementById("map_image").style.backgroundImage.slice(4,-1).replace(/"/g,"").replace("/zn/","/zn/dl/")
         dlws.send(`{"action":"MAP","message":"${cur_map_link}"}`)
     }
 }
