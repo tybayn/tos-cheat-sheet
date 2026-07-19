@@ -113,7 +113,7 @@
     "{{wiki_headlight_p1}}":"A headlamp that can be worn on the player's head, providing hands-free lighting",
     "{{wiki_lighter_p1}}":"A classic lighter that is needed to light candles and the Obsidian Shield",
     "{{wiki_storage_p1}}":"A small crate that allows a player to transport multiple items at once",
-    "{{wiki_rempod_p1}}":"A small device that emits a EMF to increase paranormal activity. Lights on the top of the device will illuminate as the ghost gets closer to the device",
+    "{{wiki_rempod_p1}}":"A small device that emits a EMF to increase paranormal activity. Lights on the top of the device will illuminate as the ghost gets closer to the device. When a ghost interacts with the device, it will show flashing lights and make noise, then turn off.",
     "{{wiki_candle_p1}}":"A basic candle that can be used to indicate paranormal activity if a ghost decides to blow out the flame",
     "{{wiki_motion1_p1}}":"A wireless motion sensor that can be placed in a room to detect movement. When the ghost moves within range of the device, the lights on the top of the device will illuminate and data will be visible in the Phantom Detect app",
     "{{wiki_motion2_p1}}":"A laser motion sensor that can be placed in a room to detect movement. When the ghost or player breaks the laser beam, the lights on the top of the device will illuminate and data will be visible in the Phantom Detect app",

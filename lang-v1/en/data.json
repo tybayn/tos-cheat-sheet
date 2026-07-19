@@ -47,8 +47,8 @@
     "{{candle_no_interaction}}": "No Interaction",
 
     "{{rem}}": "FLX-Pod",
-    "{{rem_interacts}}": "Interacts (Off)",
-    "{{rem_no_interaction}}": "No Interaction",
+    "{{rem_interacts}}": "Turns Off",
+    "{{rem_no_interaction}}": "Stays On",
 
     "{{lights}}": "Lights",
     "{{light_on_off}}": "On/Off",
