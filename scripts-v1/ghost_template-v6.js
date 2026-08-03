@@ -8,6 +8,7 @@ evi_color = {
     "Audio": "#d18c5e", 
     "EMF 20+": "#db4d48",
     "Freezing": "#9ae0f7",
+    "Ghost Orbs": "#dbd993",
     "Radiation": "#2ccc29",
     "UV": "#ad8ce7",
     "Writing": "#4d8ce3",
@@ -17,6 +18,7 @@ evi_icons = {
     "Audio": "imgs/audio-icon.png", 
     "EMF 20+": "imgs/emf5-icon.png",
     "Freezing": "imgs/freezing-icon.png",
+    "Ghost Orbs": "imgs/orbs-icon.png",
     "Radiation": "imgs/radiation-icon.png",
     "UV": "imgs/fingerprints-icon.png",
     "Writing": "imgs/writing-icon.png",
@@ -26,6 +28,7 @@ cleanse_names = {
     "Audio": "Audio", 
     "EMF 20+": "EMF",
     "Freezing": "Thermal",
+    "Ghost Orbs": "Ghost Orbs",
     "Radiation": "Radiation",
     "UV": "UV",
     "Writing": "Writing",
@@ -49,27 +52,27 @@ class Ghost {
                 <div class="ghost_hunt_entry ${data.speed > 2.42 ? 'high' : data.speed < 2.42 ? 'low' : ''}">
                     <div class="footstep_los">
                         <img src="imgs/footsteps.png" style="filter: invert(1);">
-                        <img src="imgs/los-${data.los_range}.png" class="los_range_icon" title="LOS Speed | Range: ${los_range[data.los_range]}">
+                        <img src="imgs/los-${data.los_range == -1 ? 1 : data.los_range}.png" class="los_range_icon" title="LOS Speed | Range: ${data.los_range == -1 ? "Unknown" : los_range[data.los_range]}">
                     </div>
                     <div class="ghost_hunt_values">
-                        <div class="speed_item">${parseFloat(data.speed).toFixed(2)}<span class="ms">m/s</span><span class="sound" onclick="toggleSound(${data.speed},'${data.ghost}0')">&#128266;</span></div>
-                        <div class="speed_item_alt" style="opacity: 0.7;"><div class="speed_spacer"></div>${parseFloat(data.los_speed).toFixed(2)}<span class="ms">m/s</span></div>
+                        <div class="speed_item">${data.speed == -1 ? '?.??' : parseFloat(data.speed).toFixed(2)}<span class="ms">m/s</span>${data.speed == -1 ? '' : `<span class="sound" onclick="toggleSound(${data.speed},'${data.ghost}0')">&#128266;</span>`}</div>
+                        <div class="speed_item_alt" style="opacity: 0.7;"><div class="speed_spacer"></div>${data.los_speed == -1 ? '?.??' : parseFloat(data.los_speed).toFixed(2)}<span class="ms">m/s</span></div>
                     </div>
                 </div>
-                <div class="ghost_hunt_entry ${data.holy_water > 3 ? 'low' : data.holy_water < 3 ? 'high' : ''}">
+                <div class="ghost_hunt_entry ${data.holy_water == -1 ? '' : data.holy_water > 3 ? 'low' : data.holy_water < 3 ? 'high' : ''}">
                     <div class="holy_cooldown_los">
                         <img src="imgs/holy-water.png" title="Holy Water Duration">
                     </div>
                     <div class="ghost_hunt_values_h">
-                        ${data.holy_water}<span class="ms">s</span>
+                        ${data.holy_water == -1 ? '?' : data.holy_water}<span class="ms">s</span>
                     </div>
                 </div>
-                <div class="ghost_hunt_entry ${data.cooldown > 60 ? 'low' : data.cooldown < 60 ? 'high' : ''}">
+                <div class="ghost_hunt_entry ${data.cooldown == -1 ? '' : data.cooldown > 60 ? 'low' : data.cooldown < 60 ? 'high' : ''}">
                     <div class="holy_cooldown_los">
                         <img src="imgs/stopwatch.png" title="Cooldown Duration">
                     </div>
                     <div class="ghost_hunt_values_h">
-                        ${data.cooldown}<span class="ms">s</span>
+                        ${data.cooldown == -1 ? '?' : data.cooldown}<span class="ms">s</span>
                     </div>
                 </div>
             </div>

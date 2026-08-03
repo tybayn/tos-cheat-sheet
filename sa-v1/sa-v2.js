@@ -36,11 +36,11 @@ function updateNumSAEntries(){
 
 function updateSAEntries(evi, index){
     if (index == 0){
-        $("#sa-" + evi.split('-')[0]).hide();
+        $("#sa-" + evi.split('-')[0].replace(' ','-')).hide();
     }
     else{
-        $("#sa-" + evi.split('-')[0]).text(`ADD ${evi.split('-')[0].toUpperCase()} ${index}`);
-        $("#sa-" + evi.split('-')[0]).show();
+        $("#sa-" + evi.split('-')[0].replace(' ','-')).text(`ADD ${evi.replace("Ghost","").trim().split('-')[0].toUpperCase()} ${index}`);
+        $("#sa-" + evi.split('-')[0].replace(' ','-')).show();
     }
 
     updateNumSAEntries()
