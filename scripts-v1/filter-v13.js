@@ -758,7 +758,7 @@ function filter(ignore_link=false){
 
         // Check for REM interaction
         if (selected_rem_interaction != "-"){
-            if (selected_rem_interaction == "rem_interacts" && rem_interaction != "Interact"){
+            if (selected_rem_interaction == "rem_interacts" && rem_interaction != "Turns Off"){
                 keep = false
             }
             else if (selected_rem_interaction == "rem_no_interaction" && rem_interaction != "X"){
