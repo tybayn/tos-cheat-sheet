@@ -1089,12 +1089,14 @@ function send_interaction_link(reset = false){
     let candle_states = {
         "-":" ",
         "candle_blow_out":"+",
-        "candle_no_interaction":"-"
+        "candle_light":"-",
+        "candle_blow_light":"+/-",
+        "candle_no_interaction":"/"
     }
     let rem_states = {
         "-":" ",
         "rem_interacts":"+",
-        "rem_no_interaction":"-"
+        "rem_no_interaction":"/"
     }
     let light_states = {
         "-":" ",

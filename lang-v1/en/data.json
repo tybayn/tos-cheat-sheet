@@ -27,7 +27,9 @@
     "{{speed}}": "Speed",
     "{{slow}}": "Slow",
     "{{hunts}}": "Hunts",
-    "{{speed_normal}}": "Normal <span class=\"hunt_sanity_num\">2.42m/s</span>",
+
+    "{{speed_slow}}": "Slow <span class=\"hunt_sanity_num\">2.35m/s</span>",
+    "{{speed_normal}}": "Medium <span class=\"hunt_sanity_num\">2.42m/s</span>",
     "{{speed_fast}}": "Fast <span class=\"hunt_sanity_num\">2.60m/s</span>",
 
     "{{los_speed}}": "LOS Speed",
@@ -37,13 +39,15 @@
     "{{los_fast}}": "Fast <span class=\"hunt_sanity_num\">3.10m/s</span>",
 
     "{{los_range_0}}": "None",
-    "{{los_range_1}}": "Low",
+    "{{los_range_1}}": "Near",
     "{{los_range_2}}": "Medium",
-    "{{los_range_3}}": "High",
-    "{{los_range_4}}": "Very High",
+    "{{los_range_3}}": "Far",
+    "{{los_range_4}}": "Very Far",
 
     "{{candles}}": "Candles",
     "{{candle_blow_out}}": "Blow Out",
+    "{{candle_blow_light}}": "Light/Blow",
+    "{{candle_light}}": "Light",
     "{{candle_no_interaction}}": "No Interaction",
 
     "{{rem}}": "FLX-Pod",
@@ -61,6 +65,7 @@
     "{{radio_off_only}}": "Turned Off",
 
     "{{holy_water}}": "Holy Water",
+    "{{holy_water_none}}": "None <span class=\"hunt_sanity_num\">0s</span>",
     "{{holy_water_normal}}": "Normal <span class=\"hunt_sanity_num\">3s</span>",
     "{{holy_water_long}}": "Long <span class=\"hunt_sanity_num\">5s</span>",
 

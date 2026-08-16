@@ -44,7 +44,7 @@
             return controller.signal;
         };
     </script>
-    <script src="scripts-v1/ghost_template-v6.js"></script>
+    <script src="scripts-v1/ghost_template-v7.js"></script>
     <link rel="stylesheet" href="styles-v1/style-v7.css"/>
     <link rel="stylesheet" href="styles-v1/style-mobile-v6.css"/>
     <link rel="stylesheet" href="themes-v1/themes-v1.css"/>
@@ -936,7 +936,7 @@
                 </div>
                 
                 <div class="speed">
-                    <div class="cycler" data-name="speed" data-group="hunt" data-options='["-", "{{%speed_normal}}", "{{%speed_fast}}"]'>
+                    <div class="cycler" data-name="speed" data-group="hunt" data-options='["-", "{{%speed_slow}}", "{{%speed_normal}}", "{{%speed_fast}}"]'>
                         <div class="cycler-label">{{speed}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -952,7 +952,7 @@
                         <input type="hidden">
                         <div class="cycler-counter"></div>
                     </div>
-                    <div class="cycler" data-name="holy-water" data-group="hunt" data-options='["-", "{{%holy_water_normal}}", "{{%holy_water_long}}"]'>
+                    <div class="cycler" data-name="holy-water" data-group="hunt" data-options='["-", "{{%holy_water_none}}", "{{%holy_water_normal}}", "{{%holy_water_long}}"]'>
                         <div class="cycler-label">{{holy_water}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -965,7 +965,7 @@
                     {{interactions}}
                 </div>
                 <div class="interactions">
-                    <div class="cycler" data-name="candle-interaction" data-group="interactions" data-options='["-", "{{%candle_blow_out}}", "{{%candle_no_interaction}}"]'>
+                    <div class="cycler" data-name="candle-interaction" data-group="interactions" data-options='["-", "{{%candle_blow_out}}", "{{%candle_blow_light}}", "{{%candle_light}}", "{{%candle_no_interaction}}"]'>
                         <div class="cycler-label">{{candles}}</div>
                         <button class="cycler-prev" type="button">&lt;</button>
                         <div class="cycler-value"></div>
@@ -1022,7 +1022,7 @@
                 <div id="sa-Audio" style="display: none;">ADD AUDIO 1</div>
                 <div id="sa-EMF" style="display: none;">ADD EMF 1</div>
                 <div id="sa-Thermal" style="display: none;">ADD THERMAL 1</div>
-                <div id="sa-Ghost-Orbs" style="display: none;">ADD ORBS 1</div>
+                <div id="sa-Ghost-Orb" style="display: none;">ADD ORB 1</div>
                 <div id="sa-Radiation" style="display: none;">ADD RADIATION 1</div>
                 <div id="sa-UV" style="display: none;">ADD UV 1</div>
                 <div id="sa-Writing" style="display: none;">ADD WRITING 1</div>
@@ -1134,8 +1134,8 @@
     <script src="scripts-v1/timer-v3.js"></script>
     <script src="login-v1/login-v2.js"></script>
     <script src="wiki-v1/wiki-v1.js"></script>
-    <script src="scripts-v1/filter-v13.js"></script>
-    <script src="scripts-v1/wslink-v9.js"></script>
+    <script src="scripts-v1/filter-v14.js"></script>
+    <script src="scripts-v1/wslink-v10.js"></script>
     <script src="scripts-v1/zn-v8.js"></script>
     <script src="sa-v1/sa-v2.js"></script>
     <script src="scripts-v1/search-v1.js"></script>

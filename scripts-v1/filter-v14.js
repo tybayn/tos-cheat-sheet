@@ -162,6 +162,88 @@ function tristate(elem,ignore_link=false){
     if(!ignore_link){filter(ignore_link)}
 }
 
+const MARID_BASE_EVIDENCE = ["Ghost Orbs","Radiation","UV"]
+
+function isMaridGhost(name){
+    return typeof name === "string" && name.toLowerCase() === "marid"
+}
+
+function maridEvidenceFits(found_evidence,not_evidence,num_evi,forced_evidence=""){
+    num_evi = parseInt(num_evi)
+
+    const found_base = found_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e))
+    const found_random = found_evidence.filter(e => !MARID_BASE_EVIDENCE.includes(e))
+
+    // Marid has the difficulty's normal number of evidence slots from its
+    // three base evidences, plus exactly one additional random evidence slot.
+    if (found_base.length > num_evi || found_random.length > 1){
+        return false
+    }
+
+    const available_base = MARID_BASE_EVIDENCE.filter(e => !not_evidence.includes(e))
+    if (available_base.length < num_evi){
+        return false
+    }
+
+    // If every non-base evidence has been ruled out and the random evidence
+    // has not already been found, Marid can no longer satisfy its extra slot.
+    const available_random = Object.keys(all_evidence).filter(e =>
+        !MARID_BASE_EVIDENCE.includes(e) && !not_evidence.includes(e)
+    )
+    if (found_random.length == 0 && available_random.length == 0){
+        return false
+    }
+
+    // Preserve forced-evidence behavior if Marid ever has one.
+    if (forced_evidence){
+        if (not_evidence.includes(forced_evidence)){
+            return false
+        }
+
+        if (MARID_BASE_EVIDENCE.includes(forced_evidence)){
+            if (num_evi == 0){
+                return false
+            }
+            if (!found_evidence.includes(forced_evidence) && found_base.length >= num_evi){
+                return false
+            }
+        }
+        else if (!found_evidence.includes(forced_evidence) && found_random.length >= 1){
+            return false
+        }
+    }
+
+    return true
+}
+
+function maridFalseEvidenceFits(found_evidence,maybe_evidence,not_evidence,num_evi,forced_evidence=""){
+    if (!maridEvidenceFits(found_evidence,not_evidence,num_evi,forced_evidence)){
+        return false
+    }
+
+    const found_base = found_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e)).length
+    const found_random = found_evidence.filter(e => !MARID_BASE_EVIDENCE.includes(e)).length
+    const maybe_base = maybe_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e)).length
+    const maybe_random = maybe_evidence.filter(e => !MARID_BASE_EVIDENCE.includes(e)).length
+
+    const remaining_base_slots = Math.max(parseInt(num_evi) - found_base, 0)
+    const remaining_random_slots = Math.max(1 - found_random, 0)
+    const possible_real_maybes =
+        Math.min(maybe_base,remaining_base_slots) +
+        Math.min(maybe_random,remaining_random_slots)
+
+    // Match the existing false-evidence rule: when multiple maybe evidences
+    // are selected, all but one must be capable of being real.
+    return possible_real_maybes >= Math.max(maybe_evidence.length - 1,0)
+}
+
+function maridCurrentlyPossible(){
+    const marid = Array.from(document.getElementsByClassName("ghost_card"))
+        .find(g => isMaridGhost(g.id))
+
+    return marid != null && !$(marid).hasClass("hidden")
+}
+
 function quadstate(elem,ignore_link=false,skip_good_if_maxed=true){
     var checkbox = $(elem).find("#checkbox");
     var label = $(elem).find(".label");
@@ -175,14 +257,21 @@ function quadstate(elem,ignore_link=false,skip_good_if_maxed=true){
     var evi_type = ""
     if (num_evi == '-1' || num_evi.match(/[A-K]{4}-[A-K]{4}-[A-K]{4}/g)){
         num_evi = document.getElementById("cust_num_evidence").value
-        evi_type = parseInt(document.getElementById("cust_num_evidence").value) > 0 ? '-fake' : ''
+        evi_type = parseInt(document.getElementById("cust_fake_evidence").value) > 0 ? '-fake' : ''
     }
     else{
         evi_type = difficulties[num_evi].fake > 0 ? '-fake' : '';
         num_evi = difficulties[num_evi].evi;
     }
 
-    var num_good = document.querySelectorAll(`[name="evidence${evi_type}"] .good`).length;
+    var good_evidence = Array.from(document.querySelectorAll(`[name="evidence${evi_type}"] .good`)).map(e => e.parentElement.value);
+    var bad_evidence = Array.from(document.querySelectorAll(`[name="evidence${evi_type}"] .bad`)).map(e => e.parentElement.value);
+    var num_good = good_evidence.length;
+    var candidate_evidence = $(elem).attr("value")
+    var marid_can_take_candidate =
+        maridCurrentlyPossible() &&
+        candidate_evidence != null &&
+        maridEvidenceFits([...good_evidence,candidate_evidence],bad_evidence,num_evi)
 
     if (checkbox.hasClass("neutral")){
         checkbox.removeClass("neutral")
@@ -190,7 +279,7 @@ function quadstate(elem,ignore_link=false,skip_good_if_maxed=true){
     }
     else if (checkbox.hasClass("maybe")){
         checkbox.removeClass("maybe")
-        if (skip_good_if_maxed && num_good >= num_evi){
+        if (skip_good_if_maxed && num_good >= num_evi && !marid_can_take_candidate){
             checkbox.addClass("bad")
             label.addClass("strike")
         }
@@ -491,7 +580,7 @@ function filter(ignore_link=false){
         state["evidence"][maybe_checkboxes[i].parentElement.value] = 2;
     }
 
-    var maxed = (may_evi_array.length + evi_array.length) == (num_evi + num_fake)
+    var maxed = false
 
     var selected_speed = document.querySelector('.cycler[data-name="speed"] input').value;
     var selected_los_speed = document.querySelector('.cycler[data-name="los-speed"] input').value;
@@ -531,6 +620,8 @@ function filter(ignore_link=false){
     var keep_holy_water = new Set();
     var fade_holy_water = new Set();
     var not_fade_holy_water = new Set();
+    var marid_alive = false;
+    var marid_next_evidence = new Set();
 
     for (var i = 0; i < ghosts.length; i++){
         $(ghosts[i]).removeClass("preguessed")
@@ -559,9 +650,35 @@ function filter(ignore_link=false){
         var light_interaction = ghosts[i].querySelector(".light-interaction").innerText.trim()
         var radio_interaction = ghosts[i].querySelector(".radio-interaction").innerText.trim()
 
+        var is_marid = isMaridGhost(name)
+
         // Check for evidences
+        // Marid: normal evidence slots come from its three base evidences and
+        // it can additionally give one random non-base evidence.
+        if (is_marid){
+            if (!maridEvidenceFits(evi_array,not_evi_array,num_evi,forced_evidence)){
+                keep = false
+            }
+
+            // Manage only the three base evidence icons displayed on its card.
+            evidence.forEach(function(item,index){
+                if(document.getElementById("adaptive_evidence").checked){
+                    if(evi_array.includes(item)){
+                        $(evi_objects[index]).addClass("ghost_evidence_found")
+                    }
+                    else if(not_evi_array.includes(item)){
+                        $(evi_objects[index]).addClass("ghost_evidence_not")
+                    }
+                }
+
+                if(forced_evidence && item == forced_evidence){
+                    $(evi_objects[index]).addClass("nightmare_highlight")
+                }
+            })
+        }
+
         // Standard
-        if (num_evi == 3){
+        else if (num_evi == 3){
 
             if (evi_array.length > 0){
                 evi_array.forEach(function (item,index){
@@ -693,14 +810,21 @@ function filter(ignore_link=false){
 
         // False evidence filtering
         if (may_evi_array.length > 1){
-            if (may_evi_array.length <= evidence.length){
-                if(may_evi_array.filter(element => evidence.includes(element)).length < may_evi_array.length - 1){
+            if (is_marid){
+                if (!maridFalseEvidenceFits(evi_array,may_evi_array,not_evi_array,num_evi,forced_evidence)){
                     keep = false
                 }
             }
             else{
-                if (!evidence.every(item => may_evi_array.includes(item))){
-                    keep = false
+                if (may_evi_array.length <= evidence.length){
+                    if(may_evi_array.filter(element => evidence.includes(element)).length < may_evi_array.length - 1){
+                        keep = false
+                    }
+                }
+                else{
+                    if (!evidence.every(item => may_evi_array.includes(item))){
+                        keep = false
+                    }
                 }
             }
 
@@ -711,7 +835,10 @@ function filter(ignore_link=false){
 
         //Check for speed
         if(selected_speed != "-"){
-            if (selected_speed == "speed_normal" && speed != 2.42){
+            if (selected_speed == "speed_slow" && speed >= 2.42){
+                keep = false
+            }
+            else if (selected_speed == "speed_normal" && speed != 2.42){
                 keep = false
             }
             else if (selected_speed == "speed_fast" && speed <= 2.42){
@@ -738,7 +865,10 @@ function filter(ignore_link=false){
 
         // Check for holy water duration
         if (selected_holy_water != "-"){
-            if (selected_holy_water == "holy_water_normal" && holy_water != 3){
+            if (selected_holy_water == "holy_water_none" && holy_water >= 3){
+                keep = false
+            }
+            else if (selected_holy_water == "holy_water_normal" && holy_water != 3){
                 keep = false
             }
             else if (selected_holy_water == "holy_water_long" && holy_water <= 3){
@@ -748,7 +878,13 @@ function filter(ignore_link=false){
 
         // Check for candle interaction
         if (selected_candle_interaction != "-"){
-            if (selected_candle_interaction == "candle_blow_out" && candle_interaction != "Blow Out"){
+            if (selected_candle_interaction == "candle_blow_out" && !["Blow Out","Light/Blow"].includes(candle_interaction)){
+                keep = false
+            }
+            else if (selected_candle_interaction == "candle_blow_light" && candle_interaction != "Light/Blow"){
+                keep = false
+            }
+            else if (selected_candle_interaction == "candle_light" && !["Light","Light/Blow"].includes(candle_interaction)){
                 keep = false
             }
             else if (selected_candle_interaction == "candle_no_interaction" && candle_interaction != "X"){
@@ -792,6 +928,21 @@ function filter(ignore_link=false){
             }
         }
 
+        if (is_marid && keep){
+            marid_alive = true
+
+            Object.keys(all_evidence).forEach(function(candidate){
+                if (
+                    !evi_array.includes(candidate) &&
+                    !may_evi_array.includes(candidate) &&
+                    !not_evi_array.includes(candidate) &&
+                    maridEvidenceFits([...evi_array,candidate],not_evi_array,num_evi,forced_evidence)
+                ){
+                    marid_next_evidence.add(candidate)
+                }
+            })
+        }
+
         $(ghosts[i]).removeClass(["hidden","losfiltered"])
         if (!keep){
             $(ghosts[i]).removeClass(["selected","died","guessed"])
@@ -812,8 +963,11 @@ function filter(ignore_link=false){
         }
     }
 
+    var max_evidence_slots = num_evi + num_fake + (marid_alive ? 1 : 0)
+    maxed = (may_evi_array.length + evi_array.length) >= max_evidence_slots
+
     Object.keys(all_evidence).forEach(function(item){
-        if (maxed && !evi_array.includes(item) && !may_evi_array.includes(item) && !not_evi_array.includes(item)){
+        if (maxed && !evi_array.includes(item) && !may_evi_array.includes(item) && !not_evi_array.includes(item) && !marid_next_evidence.has(item)){
             var checkbox = document.getElementById(item+evi_type);
             $(checkbox).addClass("block")
             $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
@@ -824,7 +978,7 @@ function filter(ignore_link=false){
     })
 
     if (num_evi == 3){
-        Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi)).forEach(function(item){
+        Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi) && !marid_next_evidence.has(evi)).forEach(function(item){
             if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                 var checkbox = document.getElementById(item+evi_type);
                 $(checkbox).addClass("block")
@@ -839,7 +993,7 @@ function filter(ignore_link=false){
     else if (num_evi == 2){
         var keep_evi = evi_array
         if (keep_evi.length == 2){
-            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi) && !evi_array.includes(evi)).forEach(function(item){
+            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi) && !evi_array.includes(evi) && !marid_next_evidence.has(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -851,7 +1005,7 @@ function filter(ignore_link=false){
             })
         }
         else if (keep_evi.length > 0){
-            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi)).forEach(function(item){
+            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi) && !marid_next_evidence.has(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) && (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -866,8 +1020,20 @@ function filter(ignore_link=false){
 
     else if (num_evi == 1){
         var keep_evi = evi_array
-        if (keep_evi.length == 1 && maxed){
-            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi)).forEach(function(item){
+        if (keep_evi.length == 1 && marid_alive && num_fake == 0 && !maxed){
+            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi) && !marid_next_evidence.has(evi)).forEach(function(item){
+                if (!not_evi_array.includes(item) && !may_evi_array.includes(item)){
+                    var checkbox = document.getElementById(item+evi_type);
+                    $(checkbox).addClass("block")
+                    $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])
+                    $(checkbox).find("#checkbox").addClass(["neutral","block","disabled"])
+                    $(checkbox).find(".label").addClass("disabled-text")
+                    $(checkbox).find(".label").removeClass("strike")
+                }
+            })
+        }
+        else if (keep_evi.length == 1 && maxed){
+            Object.keys(all_evidence).filter(evi => !keep_evi.includes(evi) && !marid_next_evidence.has(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) &&  (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -879,7 +1045,7 @@ function filter(ignore_link=false){
             })
         }
         else if (keep_evi.length > 0 && maxed){
-            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi)).forEach(function(item){
+            Object.keys(all_evidence).filter(evi => !keep_evidence.has(evi) && !evi_array.includes(evi) && !marid_next_evidence.has(evi)).forEach(function(item){
                 if (!not_evi_array.includes(item) && !may_evi_array.includes(item) &&  (maxed || num_fake == 0)){
                     var checkbox = document.getElementById(item+evi_type);
                     $(checkbox).addClass("block")
@@ -893,7 +1059,7 @@ function filter(ignore_link=false){
     }
 
     else if (num_evi == 0){
-        Object.keys(all_evidence).filter(evi => evi != 'Ghost Orbs').forEach(function(item){
+        Object.keys(all_evidence).filter(evi => evi != 'Ghost Orbs' && !marid_next_evidence.has(evi)).forEach(function(item){
             var checkbox = document.getElementById(item+evi_type);
             $(checkbox).addClass("block")
             $(checkbox).find("#checkbox").removeClass(["good","bad","faded"])

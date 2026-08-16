@@ -28,7 +28,7 @@ cleanse_names = {
     "Audio": "Audio", 
     "EMF 20+": "EMF",
     "Freezing": "Thermal",
-    "Ghost Orbs": "Ghost Orbs",
+    "Ghost Orbs": "Ghost Orb",
     "Radiation": "Radiation",
     "UV": "UV",
     "Writing": "Writing",
