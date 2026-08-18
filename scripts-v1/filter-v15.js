@@ -168,11 +168,20 @@ function isMaridGhost(name){
     return typeof name === "string" && name.toLowerCase() === "marid"
 }
 
+function isMaridRandomEvidence(evidence){
+    return !MARID_BASE_EVIDENCE.includes(evidence) && evidence != "Freezing"
+}
+
 function maridEvidenceFits(found_evidence,not_evidence,num_evi,forced_evidence=""){
     num_evi = parseInt(num_evi)
 
+    // Marid cannot give Freezing in any capacity.
+    if (found_evidence.includes("Freezing")){
+        return false
+    }
+
     const found_base = found_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e))
-    const found_random = found_evidence.filter(e => !MARID_BASE_EVIDENCE.includes(e))
+    const found_random = found_evidence.filter(e => isMaridRandomEvidence(e))
 
     // Marid has the difficulty's normal number of evidence slots from its
     // three base evidences, plus exactly one additional random evidence slot.
@@ -185,10 +194,9 @@ function maridEvidenceFits(found_evidence,not_evidence,num_evi,forced_evidence="
         return false
     }
 
-    // If every non-base evidence has been ruled out and the random evidence
-    // has not already been found, Marid can no longer satisfy its extra slot.
+    // The random evidence can be anything except a base evidence or Freezing.
     const available_random = Object.keys(all_evidence).filter(e =>
-        !MARID_BASE_EVIDENCE.includes(e) && !not_evidence.includes(e)
+        isMaridRandomEvidence(e) && !not_evidence.includes(e)
     )
     if (found_random.length == 0 && available_random.length == 0){
         return false
@@ -196,7 +204,7 @@ function maridEvidenceFits(found_evidence,not_evidence,num_evi,forced_evidence="
 
     // Preserve forced-evidence behavior if Marid ever has one.
     if (forced_evidence){
-        if (not_evidence.includes(forced_evidence)){
+        if (forced_evidence == "Freezing" || not_evidence.includes(forced_evidence)){
             return false
         }
 
@@ -221,13 +229,19 @@ function maridFalseEvidenceFits(found_evidence,maybe_evidence,not_evidence,num_e
         return false
     }
 
-    const found_base = found_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e)).length
-    const found_random = found_evidence.filter(e => !MARID_BASE_EVIDENCE.includes(e)).length
-    const maybe_base = maybe_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e)).length
-    const maybe_random = maybe_evidence.filter(e => !MARID_BASE_EVIDENCE.includes(e)).length
+    // Marid cannot produce Freezing as either real or false evidence.
+    if (maybe_evidence.includes("Freezing")){
+        return false
+    }
 
-    const remaining_base_slots = Math.max(parseInt(num_evi) - found_base, 0)
-    const remaining_random_slots = Math.max(1 - found_random, 0)
+    const found_base = found_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e)).length
+    const found_random = found_evidence.filter(e => isMaridRandomEvidence(e)).length
+    const maybe_base = maybe_evidence.filter(e => MARID_BASE_EVIDENCE.includes(e)).length
+    const maybe_random = maybe_evidence.filter(e => isMaridRandomEvidence(e)).length
+
+    const remaining_base_slots = Math.max(parseInt(num_evi) - found_base,0)
+    const remaining_random_slots = Math.max(1 - found_random,0)
+
     const possible_real_maybes =
         Math.min(maybe_base,remaining_base_slots) +
         Math.min(maybe_random,remaining_random_slots)
@@ -654,7 +668,7 @@ function filter(ignore_link=false){
 
         // Check for evidences
         // Marid: normal evidence slots come from its three base evidences and
-        // it can additionally give one random non-base evidence.
+        // it can additionally give one random non-base evidence, except Freezing.
         if (is_marid){
             if (!maridEvidenceFits(evi_array,not_evi_array,num_evi,forced_evidence)){
                 keep = false
@@ -878,13 +892,13 @@ function filter(ignore_link=false){
 
         // Check for candle interaction
         if (selected_candle_interaction != "-"){
-            if (selected_candle_interaction == "candle_blow_out" && !["Blow Out","Light/Blow"].includes(candle_interaction)){
+            if (selected_candle_interaction == "candle_blow_out" && candle_interaction != "Blow Out"){
                 keep = false
             }
-            else if (selected_candle_interaction == "candle_blow_light" && candle_interaction != "Light/Blow"){
+            else if (selected_candle_interaction == "candle_blow_light" && candle_interaction != "Light/Blow Out"){
                 keep = false
             }
-            else if (selected_candle_interaction == "candle_light" && !["Light","Light/Blow"].includes(candle_interaction)){
+            else if (selected_candle_interaction == "candle_light" && candle_interaction != "Light"){
                 keep = false
             }
             else if (selected_candle_interaction == "candle_no_interaction" && candle_interaction != "X"){
