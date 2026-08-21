@@ -892,13 +892,13 @@ function filter(ignore_link=false){
 
         // Check for candle interaction
         if (selected_candle_interaction != "-"){
-            if (selected_candle_interaction == "candle_blow_out" && candle_interaction != "Blow Out"){
+            if (selected_candle_interaction == "candle_blow_out" && !["Blow Out","Light/Blow","Light/Blow Out"].includes(candle_interaction)){
                 keep = false
             }
-            else if (selected_candle_interaction == "candle_blow_light" && candle_interaction != "Light/Blow Out"){
+            else if (selected_candle_interaction == "candle_blow_light" && !["Light/Blow","Light/Blow Out"].includes(candle_interaction)){
                 keep = false
             }
-            else if (selected_candle_interaction == "candle_light" && candle_interaction != "Light"){
+            else if (selected_candle_interaction == "candle_light" && !["Light","Light/Blow","Light/Blow Out"].includes(candle_interaction)){
                 keep = false
             }
             else if (selected_candle_interaction == "candle_no_interaction" && candle_interaction != "X"){
